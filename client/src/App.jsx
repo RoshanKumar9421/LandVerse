@@ -6,6 +6,7 @@ import OTPVerificationPage from './pages/OTPVerificationPage';
 import ConnectWalletPage from './pages/ConnectWalletPage';
 import KYCVerificationPage from './pages/KYCVerificationPage';
 import DashboardPage from './pages/DashboardPage';
+import LandRegistrationPage from './pages/LandRegistrationPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/connect-wallet" element={<ConnectWalletPage />} />
         <Route path="/kyc" element={<KYCVerificationPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/land-registration" element={<LandRegistrationPage />} />
       </Routes>
     </BrowserRouter>
   );
