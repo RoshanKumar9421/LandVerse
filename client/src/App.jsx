@@ -13,6 +13,7 @@ import MapExplorerPage from './pages/MapExplorerPage';
 import PaymentConfirmationPage from './pages/PaymentConfirmationPage';
 import OwnershipTransferSuccessPage from './pages/OwnershipTransferSuccessPage';
 import LandRegistrationPage from './pages/LandRegistrationPage';
+import AuthorityDashboardPage from './pages/AuthorityDashboardPage';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/payment" element={<PaymentConfirmationPage />} />
         <Route path="/transfer-success" element={<OwnershipTransferSuccessPage />} />
         <Route path="/land-registration" element={<LandRegistrationPage />} />
+        <Route path="/authority-dashboard" element={<AuthorityDashboardPage />} />
 
       </Routes>
     </BrowserRouter>

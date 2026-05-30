@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LandVerse Authority Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-dim": "#d7383b",
+                    "surface-tint": "#8ff5ff",
+                    "surface-bright": "#292c38",
+                    "on-primary-fixed": "#003f43",
+                    "on-surface-variant": "#aaaab6",
+                    "surface-variant": "#222531",
+                    "on-tertiary-fixed": "#344900",
+                    "surface-dim": "#0c0e16",
+                    "inverse-primary": "#006a71",
+                    "background": "#0c0e16",
+                    "outline": "#74757f",
+                    "error": "#ff716c",
+                    "on-secondary-fixed": "#41009a",
+                    "tertiary-dim": "#b0ed00",
+                    "on-tertiary": "#4a6600",
+                    "secondary-container": "#7000ff",
+                    "secondary-dim": "#874cff",
+                    "on-secondary": "#290067",
+                    "secondary": "#ac89ff",
+                    "on-primary-container": "#005359",
+                    "tertiary": "#e9ffb9",
+                    "primary-fixed": "#00eefc",
+                    "inverse-on-surface": "#53545e",
+                    "on-primary-fixed-variant": "#005e64",
+                    "surface-container": "#171923",
+                    "surface": "#0c0e16",
+                    "tertiary-fixed": "#bbfd00",
+                    "on-tertiary-fixed-variant": "#4b6800",
+                    "on-secondary-container": "#f8f1ff",
+                    "on-surface": "#ededf9",
+                    "primary-fixed-dim": "#00deec",
+                    "on-secondary-fixed-variant": "#6300e2",
+                    "primary": "#8ff5ff",
+                    "tertiary-container": "#bbfd00",
+                    "secondary-fixed": "#dac9ff",
+                    "on-tertiary-container": "#435d00",
+                    "surface-container-low": "#11131c",
+                    "on-background": "#ededf9",
+                    "on-error": "#490006",
+                    "outline-variant": "#464751",
+                    "surface-container-high": "#1d1f2a",
+                    "primary-dim": "#00deec",
+                    "error-container": "#9f0519",
+                    "on-error-container": "#ffa8a3",
+                    "secondary-fixed-dim": "#ceb9ff",
+                    "surface-container-lowest": "#000000",
+                    "surface-container-highest": "#222531",
+                    "primary-container": "#00eefc",
+                    "on-primary": "#005d63",
+                    "tertiary-fixed-dim": "#b0ed00",
+                    "inverse-surface": "#faf8ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "display": ["Space Grotesk"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(34, 37, 49, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #8ff5ff 0%, #00eefc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .ghost-border {
+            outline: 1px solid rgba(70, 71, 81, 0.15);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0e16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #171923;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body overflow-x-hidden selection:bg-primary/30">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full z-40 bg-surface-container dark:bg-surface-container h-screen w-72 flex flex-col shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+<div class="p-8">
+<h1 class="text-2xl font-display font-bold bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">LandVerse</h1>
+<p class="font-label uppercase tracking-widest text-[0.65rem] text-on-surface-variant mt-1">Registry Authority</p>
+</div>
+<nav class="flex-1 mt-4">
+<div class="space-y-1">
+<!-- Dashboard Active State -->
+<a class="flex items-center gap-3 px-8 py-4 bg-primary/10 text-primary border-r-4 border-primary-fixed transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-headline tracking-wide font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-4 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="font-headline tracking-wide">KYC Requests</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-4 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-headline tracking-wide">Land Verifications</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-4 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-headline tracking-wide">Fraud Alerts</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-4 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-headline tracking-wide">System Logs</span>
+</a>
+</div>
+</nav>
+<div class="p-6">
+<button class="w-full py-4 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold shadow-[0_4px_20px_rgba(143,245,255,0.2)] active:scale-95 transition-transform duration-150">
+                New Entry
+            </button>
+<div class="mt-8 flex items-center gap-3 px-2">
+<div class="relative">
+<img alt="Admin User Avatar" class="w-10 h-10 rounded-full object-cover border border-primary/20" data-alt="A sophisticated professional portrait of a senior tech executive with salt-and-pepper hair, wearing a sleek black turtleneck. The person is lit by soft, cinematic blue and purple ambient lights in a high-tech, futuristic office environment. The style is ultra-modern, editorial, and conveys deep authority and experience in a digital age." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9hvVavHZPZy4sIdE-YmZwBGRvoZfxz6Vl-Jpfb5V7_oiRLmPOFr53wq414lM9ImLTpeGKxDgizvlgDQVxCHefit2WVW5XNaDG-1FGMXqep0p55l7BXWgpyUmzAc4bevNVFuoK45bVboiOzhb4irzA71FQHpKnIkcAAbflS87hrMZGGEDhAmzKTr_Es3ne533ZBNlJjsK23f9tC25ODTSZeybLPDjulD16eFXaK0YLDg1h-mlxX_9Yfu5g2Jf60pyImgnaTpqdhJm6"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-tertiary rounded-full border-2 border-surface-container shadow-sm animate-pulse"></div>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Admin User</p>
+<p class="text-[0.7rem] text-on-surface-variant uppercase tracking-tighter">Chief Registrar</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 min-h-screen">
+<!-- TopNavBar Shell -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-12 h-20 bg-surface/40 dark:bg-surface/40 backdrop-blur-xl">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-sm py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 transition-all" placeholder="Search transactions, properties, or identities..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant hover:text-primary transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-surface-dim"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/20"></div>
+<div class="flex items-center gap-3">
+<span class="font-headline text-lg font-bold gradient-text">Authority Panel</span>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center ghost-border">
+<span class="material-symbols-outlined text-sm">shield</span>
+</div>
+</div>
+</div>
+</header>
+<section class="p-12 space-y-12 max-w-7xl mx-auto">
+<!-- Metric Cards (The Tonal Depth Layering) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Metric 1 -->
+<div class="surface-container-low p-8 rounded-lg relative overflow-hidden group hover:bg-surface-container-high transition-all duration-300 ghost-border">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-primary/10 rounded-md">
+<span class="material-symbols-outlined text-primary">how_to_reg</span>
+</div>
+<span class="flex items-center gap-1 text-[0.7rem] font-label text-tertiary">
+<span class="material-symbols-outlined text-[1rem]">trending_up</span> +12%
+                        </span>
+</div>
+<p class="font-label uppercase text-[0.7rem] text-on-surface-variant tracking-[0.2em]">Pending KYC Requests</p>
+<h3 class="text-4xl font-display font-bold mt-2">1,284</h3>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl">how_to_reg</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="surface-container-low p-8 rounded-lg relative overflow-hidden group hover:bg-surface-container-high transition-all duration-300 ghost-border">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-secondary/10 rounded-md">
+<span class="material-symbols-outlined text-secondary">verified_user</span>
+</div>
+<span class="flex items-center gap-1 text-[0.7rem] font-label text-on-surface-variant">
+                            STABLE
+                        </span>
+</div>
+<p class="font-label uppercase text-[0.7rem] text-on-surface-variant tracking-[0.2em]">Pending Land Verifications</p>
+<h3 class="text-4xl font-display font-bold mt-2">456</h3>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl">verified_user</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="surface-container-low p-8 rounded-lg relative overflow-hidden group hover:bg-surface-container-high transition-all duration-300 ghost-border">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-error/10 rounded-md">
+<span class="material-symbols-outlined text-error">report_problem</span>
+</div>
+<span class="flex items-center gap-1 text-[0.7rem] font-label text-error">
+                            URGENT
+                        </span>
+</div>
+<p class="font-label uppercase text-[0.7rem] text-on-surface-variant tracking-[0.2em]">Fraud Detection Alerts</p>
+<h3 class="text-4xl font-display font-bold mt-2 text-error">21</h3>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl text-error">report_problem</span>
+</div>
+</div>
+</div>
+<!-- Land Review Panel (Asymmetric Bento Style) -->
+<div class="space-y-6">
+<div class="flex items-end justify-between px-2">
+<div>
+<span class="text-primary font-label text-[0.7rem] tracking-widest uppercase">Critical Action Required</span>
+<h2 class="text-3xl font-display font-bold mt-1">Land Review Panel</h2>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant text-sm">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+                            Live Ledger Sync
+                        </div>
+<span>Case #REV-00912</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Content: Property & Details -->
+<div class="col-span-12 lg:col-span-8 glass-card rounded-lg p-10 border border-primary/5">
+<div class="flex flex-col md:flex-row justify-between gap-12">
+<div class="space-y-10 flex-1">
+<!-- Owner Section -->
+<div class="flex items-center gap-6">
+<img alt="Alex Sterling Avatar" class="w-16 h-16 rounded-full object-cover ghost-border" data-alt="A portrait of a young, stylish male entrepreneur named Alex Sterling. He has short-cropped hair and a sharp jawline, looking directly at the camera with a confident expression. The lighting is cold, with cyan and teal highlights reflecting off his skin, set against a dark, minimalist architectural background that suggests a premium lifestyle." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm7gAMTnBgnEoGSIlB1WXRjNlzvLmP98IuvjRK1s5pGm-A_VpvKKZjTZDI43rR-SWsA2mkZUyzcVcbqyHbPUoooILnYDyvDNE4ofoe8lVN-9ZQVuyVcf4DCoUGvOpRscPgP1DMPfHu_zVhsmscVKTi3t3Te8TOyxDMsN7MZMnPd1yQI-xNDM17AskdsJt8AjUeKgkFG2a2zctRfJCJWzlHGq5oCJEyVD5BOODxiec7gzM0g2XWPvyzaZq-1kjyJyvpbrh5yecpOPEn"/>
+<div>
+<p class="font-label uppercase text-[0.6rem] text-on-surface-variant tracking-[0.2em]">Owner Details</p>
+<h4 class="text-2xl font-display font-bold">Alex Sterling</h4>
+<p class="font-label text-xs font-mono text-primary/70 mt-1">ID: OX82F...A1E</p>
+</div>
+</div>
+<!-- Specs Section -->
+<div class="grid grid-cols-2 gap-8 py-8 border-y border-outline-variant/10">
+<div>
+<p class="font-label uppercase text-[0.6rem] text-on-surface-variant tracking-[0.2em]">Plot Reference</p>
+<p class="text-xl font-headline font-bold mt-1">#PL-881</p>
+</div>
+<div>
+<p class="font-label uppercase text-[0.6rem] text-on-surface-variant tracking-[0.2em]">Total Area</p>
+<p class="text-xl font-headline font-bold mt-1">1,250 SQ. FT.</p>
+</div>
+</div>
+<!-- Documents Section -->
+<div>
+<p class="font-label uppercase text-[0.6rem] text-on-surface-variant tracking-[0.2em] mb-4">Document Gallery</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="surface-container p-4 rounded-md flex items-center justify-between ghost-border group hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">description</span>
+</div>
+<span class="text-sm font-medium">Title Deed</span>
+</div>
+<button class="text-[0.7rem] uppercase font-label font-bold text-primary hover:underline">View File</button>
+</div>
+<div class="surface-container p-4 rounded-md flex items-center justify-between ghost-border group hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">verified</span>
+</div>
+<span class="text-sm font-medium">Ownership Proof</span>
+</div>
+<button class="text-[0.7rem] uppercase font-label font-bold text-secondary hover:underline">View File</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Section -->
+<div class="w-full md:w-80 space-y-4">
+<p class="font-label uppercase text-[0.6rem] text-on-surface-variant tracking-[0.2em]">Geospatial Preview</p>
+<div class="aspect-square w-full rounded-lg overflow-hidden relative group border border-outline-variant/20">
+<img alt="Geospatial Map" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A dark-themed satellite topographical map of a modern urban land plot, highlighted with glowing cyan grid lines and neon perimeter markers. The visualization is futuristic and technical, using deep navy and charcoal colors with high-contrast electric blue data overlays that indicate precise coordinates and terrain elevation." data-location="London" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOJOGV7JNQXaM0gwFdcXYg4QgXeqeICK4swRAx5_GT5BAONNpVbxaJ8ppuqepbPOkOdwoAKKGj_jlBlIMyJJB1uiwKDGnIugbHrGFELbZEJTWrZPCah6T15gTZCo7o3kZbZBNWtqyfooZgSV7--U7G0jUkw_3DNHrbj0ASFE3vdDFGgnWr4hb9yFfJK7IB9vEoy75pWyMyzUf9dsvzxNkUnDfG4pL8PhMAmmjrOffgML38gD3_JYa02qDhMlg31q8qbuXLgAO02LxX"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+<button class="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-surface-bright/90 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest border border-white/10 hover:bg-primary hover:text-on-primary transition-all">
+                                        Open Map
+                                    </button>
+</div>
+<div class="flex items-center gap-2 text-[0.6rem] font-mono text-on-surface-variant justify-center bg-surface-container-lowest py-2 rounded">
+                                    51.5074° N, 0.1278° W
+                                </div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Decision Hub -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-8">
+<div class="surface-container p-8 rounded-lg ghost-border flex-1 flex flex-col justify-center space-y-6">
+<h3 class="text-xl font-display font-bold">Registry Decision</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                                Review all associated metadata and blockchain hash verification before final submission. Approved records are immutable on the MainNet.
+                            </p>
+<div class="space-y-4 pt-4">
+<button class="w-full py-4 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold shadow-[0_4px_30px_rgba(0,238,252,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                                    Approve Property
+                                </button>
+<button class="w-full py-4 rounded-md ghost-border text-on-surface font-bold hover:bg-surface-variant active:scale-95 transition-all">
+                                    Request Changes
+                                </button>
+<button class="w-full py-4 rounded-md bg-error/10 text-error border border-error/20 font-bold hover:bg-error hover:text-on-error active:scale-95 transition-all">
+                                    Reject Entry
+                                </button>
+</div>
+</div>
+<!-- Secondary Info Card -->
+<div class="surface-container-low p-6 rounded-lg border-l-4 border-secondary/50">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-secondary text-sm">info</span>
+<p class="text-xs font-bold uppercase tracking-widest text-secondary">Provisional Alert</p>
+</div>
+<p class="text-xs text-on-surface-variant">
+                                Cross-reference with the Department of Urban Development (DUD) suggests a minor boundary overlap with Plot #PL-880. Proceed with caution.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Visual Polish: Background Aura -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] pointer-events-none rounded-full"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-secondary/5 blur-[100px] pointer-events-none rounded-full"></div>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('scale-95');
+                setTimeout(() => this.classList.remove('scale-95'), 150);
+            });
+        });
+    </script>
+</body></html>

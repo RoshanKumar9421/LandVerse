@@ -105,6 +105,9 @@ const LoginPage = () => {
                   <span>Register New Account</span>
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                 </Link>
+                <Link to="/authority-dashboard" className="font-label text-xs tracking-wider text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
+                  Admin Login
+                </Link>
               </div>
             </div>
           </div>
