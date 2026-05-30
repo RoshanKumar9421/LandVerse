@@ -5,7 +5,6 @@ import { routes } from './routes';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import OTPVerificationPage from './pages/OTPVerificationPage';
 import ConnectWalletPage from './pages/ConnectWalletPage';
 import KYCVerificationPage from './pages/KYCVerificationPage';
 import DashboardPage from './pages/DashboardPage';
@@ -28,7 +27,6 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verify" element={<OTPVerificationPage />} />
         <Route path="/connect-wallet" element={<ConnectWalletPage />} />
         <Route path="/kyc" element={<KYCVerificationPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

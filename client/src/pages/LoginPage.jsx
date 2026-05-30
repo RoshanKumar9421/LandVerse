@@ -1,9 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const loginBtnRef = useRef(null);
+
+  // States for login form
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -31,6 +38,26 @@ const LoginPage = () => {
     const y = e.clientY - rect.top;
     loginBtnRef.current.style.setProperty('--mouse-x', `${x}px`);
     loginBtnRef.current.style.setProperty('--mouse-y', `${y}px`);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    navigate('/dashboard');
   };
 
   return (
@@ -64,12 +91,19 @@ const LoginPage = () => {
               <h1 className="font-display text-4xl font-bold tracking-tight text-on-surface">Welcome Back</h1>
             </div>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
+            {/* Error Message Box */}
+            {error && (
+              <div className="mb-6 bg-error/10 text-error border border-error/20 p-4 rounded-md text-sm font-medium animate-pulse">
+                {error}
+              </div>
+            )}
+
+            <form className="space-y-6" onSubmit={handleLogin}>
               {/* Email/User ID Input */}
               <div className="space-y-2">
-                <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant ml-1" htmlFor="username">Email or User ID</label>
+                <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant ml-1" htmlFor="username">Email Address</label>
                 <div className="relative group">
-                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="username" placeholder="arch@landverse.xyz" type="text"/>
+                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="username" placeholder="arch@landverse.xyz" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
                   <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 group-focus-within:text-primary-dim transition-colors">person</span>
                 </div>
               </div>
@@ -78,10 +112,10 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant" htmlFor="password">Security Key</label>
-                  <a className="text-[10px] tracking-widest uppercase text-primary hover:text-primary-dim transition-colors" href="#">Forgot Passwo?</a>
+                  <a className="text-[10px] tracking-widest uppercase text-primary hover:text-primary-dim transition-colors" href="#">Forgot Password?</a>
                 </div>
                 <div className="relative group">
-                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="password" placeholder="••••••••••••" type="password"/>
+                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="password" placeholder="••••••••••••" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                   <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 group-focus-within:text-primary-dim transition-colors">lock</span>
                 </div>
               </div>
@@ -91,9 +125,10 @@ const LoginPage = () => {
                 <button 
                   ref={loginBtnRef}
                   onMouseMove={handleBtnMouseMove}
-                  className="w-full primary-gradient text-on-primary-fixed py-5 rounded-md font-headline font-bold text-lg tracking-wide hover:shadow-[0_0_20px_rgba(143,245,255,0.4)] active:scale-[0.98] transition-all duration-300"
+                  disabled={loading}
+                  className="w-full primary-gradient text-on-primary-fixed py-5 rounded-md font-headline font-bold text-lg tracking-wide hover:shadow-[0_0_20px_rgba(143,245,255,0.4)] active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
                 >
-                  Login to Registry
+                  {loading ? 'Logging in...' : 'Login to Registry'}
                 </button>
               </div>
             </form>

@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const RegisterPage = () => {
   const [role, setRole] = useState('owner');
   const navigate = useNavigate();
+
+  // State bindings for registration form
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -18,6 +28,46 @@ const RegisterPage = () => {
     document.addEventListener('mousemove', handleMouseMove);
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    // Generate a secure mock Web3 wallet address for registration (39 hex digits matching frontend style)
+    const randomHex = Array.from({ length: 39 }, () => 
+      Math.floor(Math.random() * 16).toString(16)
+    ).join('');
+    const walletAddress = '0x' + randomHex;
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          role: role, // owner/buyer (trigger translates owner -> seller)
+          phone: phone,
+          wallet_address: walletAddress
+        }
+      }
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    navigate('/dashboard');
+  };
 
   return (
     <div className="bg-background text-on-background font-body min-h-screen flex flex-col selection:bg-primary selection:text-on-primary-container bg-mesh">
@@ -42,7 +92,7 @@ const RegisterPage = () => {
             <div className="relative z-10">
               <h1 className="font-display text-5xl font-bold leading-tight mb-6 tracking-tight">Join the Digital <span className="text-primary">Frontier</span></h1>
               <p className="text-on-surface-variant text-lg leading-relaxed max-w-md">
-                Step into a decentralized ecosystem where property rights are immutable. Register to start managing or acquiring digital land on the Ethereal Ledger.
+                Step into a ecosystem where property rights are immutable. Register to start managing or acquiring digital land on the Ethereal Ledger.
               </p>
             </div>
             <div className="relative z-10 space-y-6">
@@ -79,7 +129,14 @@ const RegisterPage = () => {
               <p className="text-on-surface-variant">Provide your details to initiate registry access.</p>
             </div>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/verify'); }}>
+            {/* Error Message Box */}
+            {error && (
+              <div className="mb-6 bg-error/10 text-error border border-error/20 p-4 rounded-md text-sm font-medium animate-pulse">
+                {error}
+              </div>
+            )}
+
+            <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Role Selection */}
               <div className="space-y-3">
                 <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant">Identity Role</label>
@@ -106,34 +163,34 @@ const RegisterPage = () => {
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="name">Full Name</label>
                   <div className="relative">
-                    <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="name" placeholder="Alex Sterling" type="text"/>
+                    <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="name" placeholder="Alex Sterling" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required/>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="phone">Phone Number</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="phone" placeholder="+1 (555) 000-0000" type="tel"/>
+                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="phone" placeholder="+1 (555) 000-0000" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}/>
                 </div>
               </div>
               
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="email">Email Address</label>
-                <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="email" placeholder="alex@protocol.eth" type="email"/>
+                <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="email" placeholder="alex@protocol.eth" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="password">Password</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="password" placeholder="••••••••" type="password"/>
+                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="password" placeholder="••••••••" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                 </div>
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="confirm">Confirm Password</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="confirm" placeholder="••••••••" type="password"/>
+                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="confirm" placeholder="••••••••" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required/>
                 </div>
               </div>
               
               <div className="pt-4 flex flex-col space-y-4">
-                <button className="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg rounded-md hover:shadow-[0_0_20px_rgba(143,245,255,0.3)] transition-all duration-300 active:scale-[0.98]">
-                  Register Account
+                <button disabled={loading} className="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg rounded-md hover:shadow-[0_0_20px_rgba(143,245,255,0.3)] transition-all duration-300 active:scale-[0.98] disabled:opacity-50">
+                  {loading ? 'Registering...' : 'Register Account'}
                 </button>
                 <p className="text-center text-sm text-on-surface-variant">
                   By registering, you agree to our <a className="text-primary hover:underline" href="#">Terms of Service</a> and <a className="text-primary hover:underline" href="#">Privacy Protocol</a>.
