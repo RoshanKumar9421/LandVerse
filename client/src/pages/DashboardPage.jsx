@@ -67,7 +67,6 @@ const DashboardPage = () => {
         {/* Brand */}
         <div className="mb-12">
           <h1 className="text-2xl font-display font-bold tracking-tighter text-primary">LandVerse</h1>
-          <p className="text-xs font-label uppercase tracking-widest text-on-surface-variant mt-1">Verified Architect</p>
         </div>
 
         {/* Nav Links */}
@@ -304,35 +303,11 @@ const DashboardPage = () => {
                 </div>
               </GlassCard>
 
-              {/* Market Insight */}
-              <div className="bg-secondary-container/10 border border-secondary/20 rounded-lg p-6 flex items-start gap-4">
-                <div className="bg-secondary/20 p-3 rounded-md flex-shrink-0">
-                  <span className="material-symbols-outlined text-secondary">trending_up</span>
-                </div>
-                <div>
-                  <p className="text-sm font-display font-bold">Market Growth Alert</p>
-                  <p className="text-xs text-on-surface-variant mt-1">
-                    Land values in Metropolis Sector 7G have increased by{' '}
-                    <span className="text-secondary font-bold">14.2%</span> in the last 24 hours.
-                  </p>
-                </div>
-              </div>
+              
             </div>
           </div>
 
-          {/* ── Blockchain Ticker ── */}
-          <div className="mt-16 flex items-center justify-center py-10">
-            <div className="flex items-center gap-4 text-on-surface-variant">
-              <div className="relative">
-                <div className="w-3 h-3 bg-tertiary rounded-full" />
-                <div className="absolute inset-0 w-3 h-3 bg-tertiary rounded-full animate-ping opacity-50" />
-              </div>
-              <span className="text-sm font-label tracking-widest uppercase opacity-60">
-                Blockchain Ledger Synced to Block{' '}
-                <span id="block-ticker">#18,492,031</span>
-              </span>
-            </div>
-          </div>
+          
 
         </div>{/* /content */}
       </main>

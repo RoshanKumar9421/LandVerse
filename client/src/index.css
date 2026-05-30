@@ -100,19 +100,23 @@
   text-shadow: 0 0 20px rgba(143, 245, 255, 0.3);
 }
 
-.glow-button {
-  transition: all 0.3s ease;
-  box-shadow: 0 0 15px rgba(143, 245, 255, 0.2);
-}
-.glow-button:hover {
-  box-shadow: 0 0 30px rgba(143, 245, 255, 0.5);
-  transform: translateY(-1px);
-}
-.pulse-contract {
-  animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse-border {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+.map-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(143, 245, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(143, 245, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
+.pulse-tertiary {
+  animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(1.2); }
+}
+
+@keyframes scan {
+  from { top: 0; }
+  to { top: 100%; }
+}

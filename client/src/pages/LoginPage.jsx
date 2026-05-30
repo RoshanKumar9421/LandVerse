@@ -35,23 +35,6 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden bg-surface text-on-surface">
-      {/* TopAppBar */}
-      <header className="fixed top-0 w-full z-50 bg-surface-variant/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-        <div className="flex justify-between items-center h-20 px-8 w-full">
-          <Link to="/" className="text-2xl font-headline font-bold tracking-widest text-primary">LandVerse</Link>
-          <nav className="hidden md:flex space-x-8 items-center">
-            <a className="font-headline text-on-surface-variant hover:text-primary-dim transition-colors duration-300 active:scale-95 transition-transform" href="#">Marketplace</a>
-            <a className="font-headline text-on-surface-variant hover:text-primary-dim transition-colors duration-300 active:scale-95 transition-transform" href="#">Genesis</a>
-            <a className="font-headline text-on-surface-variant hover:text-primary-dim transition-colors duration-300 active:scale-95 transition-transform" href="#">Registry</a>
-            <div className="h-6 w-[1px] bg-outline-variant/30"></div>
-            <Link to="/login" className="font-headline text-primary font-bold hover:text-primary-dim transition-colors duration-300 active:scale-95 transition-transform">Access Portal</Link>
-          </nav>
-          <div className="md:hidden">
-            <span className="material-symbols-outlined text-on-surface">menu</span>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content Area */}
       <main className="flex-grow flex items-center justify-center relative px-6 py-24">
         {/* Atmospheric Background Elements */}
@@ -79,7 +62,6 @@ const LoginPage = () => {
                 <span className="font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant">Secure Ledger Auth</span>
               </div>
               <h1 className="font-display text-4xl font-bold tracking-tight text-on-surface">Welcome Back</h1>
-              <p className="font-body text-on-surface-variant mt-2 text-sm">Securely access your digital land holdings and title records.</p>
             </div>
             
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
@@ -96,7 +78,7 @@ const LoginPage = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant" htmlFor="password">Security Key</label>
-                  <a className="text-[10px] tracking-widest uppercase text-primary hover:text-primary-dim transition-colors" href="#">Forgot?</a>
+                  <a className="text-[10px] tracking-widest uppercase text-primary hover:text-primary-dim transition-colors" href="#">Forgot Passwo?</a>
                 </div>
                 <div className="relative group">
                   <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="password" placeholder="••••••••••••" type="password"/>
@@ -123,31 +105,11 @@ const LoginPage = () => {
                   <span>Register New Account</span>
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                 </Link>
-                <a className="font-label text-xs tracking-wider text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
-                  Admin Login
-                </a>
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-surface-container-low w-full py-12 mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-7xl mx-auto space-y-4 md:space-y-0">
-          <div className="flex flex-col items-center md:items-start space-y-2">
-            <div className="font-headline text-lg text-on-surface font-bold tracking-widest">LandVerse</div>
-            <div className="font-body text-sm text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity">
-                © 2024 LandVerse. Built on The Ethereal Ledger.
-            </div>
-          </div>
-          <div className="flex space-x-8">
-            <a className="font-body text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Protocol</a>
-            <a className="font-body text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Legal</a>
-            <a className="font-body text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
