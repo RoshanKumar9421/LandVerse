@@ -94,7 +94,7 @@ const NFT_miningPage = () => {
 
   const handleConnectWallet = () => {
     setIsConnectingWallet(true);
-    triggerToast('Connecting Web3 Wallet...', 'info');
+    triggerToast('Connecting Web3 Wallet...', 'info');  
     setTimeout(() => {
       setWalletConnected(true);
       setWalletAddress('0x82f0a1e3e920d3f2c5d144888fca02d18492031');
