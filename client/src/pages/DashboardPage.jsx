@@ -296,10 +296,10 @@ const DashboardPage = () => {
                   <p className="text-xs text-on-surface-variant mb-4 font-label tracking-tighter">HASH: 0x92f...e76c</p>
                   <div className="flex justify-between items-center mt-auto">
                     <span className="text-primary font-bold">4.2 ETH</span>
-                    <button className="text-on-surface-variant hover:text-on-surface transition-colors font-label text-xs uppercase font-bold flex items-center gap-2">
+                    <Link to="/payment" className="text-on-surface-variant hover:text-on-surface transition-colors font-label text-xs uppercase font-bold flex items-center gap-2">
                       View Details
                       <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </GlassCard>

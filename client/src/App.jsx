@@ -7,6 +7,9 @@ import ConnectWalletPage from './pages/ConnectWalletPage';
 import KYCVerificationPage from './pages/KYCVerificationPage';
 import DashboardPage from './pages/DashboardPage';
 import MapExplorerPage from './pages/MapExplorerPage';
+import PaymentConfirmationPage from './pages/PaymentConfirmationPage';
+import OwnershipTransferSuccessPage from './pages/OwnershipTransferSuccessPage';
+import LandRegistrationPage from './pages/LandRegistrationPage';
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
         <Route path="/kyc" element={<KYCVerificationPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/map-explorer" element={<MapExplorerPage />} />
+        <Route path="/payment" element={<PaymentConfirmationPage />} />
+        <Route path="/transfer-success" element={<OwnershipTransferSuccessPage />} />
+        <Route path="/land-registration" element={<LandRegistrationPage />} />
       </Routes>
     </BrowserRouter>
   );
