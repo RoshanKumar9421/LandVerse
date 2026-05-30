@@ -24,14 +24,9 @@ const RegisterPage = () => {
       {/* TopAppBar */}
       <header className="fixed top-0 w-full z-50 bg-surface-variant/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] h-20 px-8 flex justify-between items-center">
         <Link to="/" className="text-2xl font-headline font-bold tracking-widest text-primary">LandVerse</Link>
-        <nav className="hidden md:flex space-x-8">
-          <Link to="/" className="text-on-surface-variant hover:text-primary-dim transition-colors duration-300 font-headline">Explore</Link>
-          <a className="text-on-surface-variant hover:text-primary-dim transition-colors duration-300 font-headline" href="#">Protocol</a>
-          <a className="text-on-surface-variant hover:text-primary-dim transition-colors duration-300 font-headline" href="#">Ledger</a>
-        </nav>
+      
         <div className="flex items-center space-x-4">
           <Link to="/login" className="text-primary font-bold hover:text-primary-dim transition-colors duration-300">Login</Link>
-          <Link to="/connect-wallet" className="bg-gradient-to-br from-primary to-primary-container text-on-primary-container px-6 py-2 rounded-md font-bold transition-transform active:scale-95">Connect Wallet</Link>
         </div>
       </header>
 
@@ -148,21 +143,6 @@ const RegisterPage = () => {
           </div>
         </section>
       </main>
-      
-      {/* Footer */}
-      <footer className="w-full py-12 bg-surface-container-low mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-7xl mx-auto space-y-4 md:space-y-0">
-          <div className="flex items-center space-x-6">
-            <span className="font-headline text-lg text-on-surface">LandVerse</span>
-            <span className="font-body text-sm text-on-surface-variant opacity-80">© 2024 LandVerse. Built on The Ethereal Ledger.</span>
-          </div>
-          <div className="flex space-x-8">
-            <a className="text-on-surface-variant hover:text-secondary transition-colors text-sm font-body" href="#">Protocol</a>
-            <a className="text-on-surface-variant hover:text-secondary transition-colors text-sm font-body" href="#">Legal</a>
-            <a className="text-on-surface-variant hover:text-secondary transition-colors text-sm font-body" href="#">Privacy</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
