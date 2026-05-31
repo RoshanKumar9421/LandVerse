@@ -5,6 +5,16 @@ const RegisterPage = () => {
   const [role, setRole] = useState('owner');
   const navigate = useNavigate();
 
+  // State Variables
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+
   useEffect(() => {
     const handleMouseMove = (e) => {
       const moveX = (e.clientX - window.innerWidth / 2) / 50;
@@ -18,6 +28,60 @@ const RegisterPage = () => {
     document.addEventListener('mousemove', handleMouseMove);
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    if (!fullName || !email || !password || !confirmPassword) {
+      setErrorMessage('Please fill in all required fields.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName,
+          phone: phone || null,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to complete registration.');
+      }
+
+      setSuccessMessage('Registration successful! Redirecting to login portal...');
+      localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.session) {
+        localStorage.setItem('session', JSON.stringify(data.session));
+      }
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+
+    } catch (err) {
+      console.error('Registration failed:', err);
+      setErrorMessage(err.message || 'An error occurred during registration.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-background text-on-background font-body min-h-screen flex flex-col selection:bg-primary selection:text-on-primary-container bg-mesh">
@@ -84,7 +148,21 @@ const RegisterPage = () => {
               <p className="text-on-surface-variant">Provide your details to initiate registry access.</p>
             </div>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/verify'); }}>
+            <form className="space-y-6" onSubmit={handleRegister}>
+              {/* Error Message Banner */}
+              {errorMessage && (
+                <div className="p-4 bg-error-container/30 border border-error/50 rounded-md text-xs text-error font-body">
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Success Message Banner */}
+              {successMessage && (
+                <div className="p-4 bg-primary-container/20 border border-primary/50 rounded-md text-xs text-primary font-body">
+                  {successMessage}
+                </div>
+              )}
+
               {/* Role Selection */}
               <div className="space-y-3">
                 <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant">Identity Role</label>
@@ -111,34 +189,77 @@ const RegisterPage = () => {
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="name">Full Name</label>
                   <div className="relative">
-                    <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="name" placeholder="Alex Sterling" type="text"/>
+                    <input 
+                      className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" 
+                      id="name" 
+                      placeholder="Alex Sterling" 
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="phone">Phone Number</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="phone" placeholder="+1 (555) 000-0000" type="tel"/>
+                  <input 
+                    className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" 
+                    id="phone" 
+                    placeholder="+1 (555) 000-0000" 
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="email">Email Address</label>
-                <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="email" placeholder="alex@protocol.eth" type="email"/>
+                <input 
+                  className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" 
+                  id="email" 
+                  placeholder="alex@protocol.eth" 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="password">Password</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="password" placeholder="••••••••" type="password"/>
+                  <input 
+                    className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" 
+                    id="password" 
+                    placeholder="••••••••" 
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant" htmlFor="confirm">Confirm Password</label>
-                  <input className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" id="confirm" placeholder="••••••••" type="password"/>
+                  <input 
+                    className="w-full bg-surface-container-lowest border-none rounded-sm px-4 py-3 text-on-surface focus:ring-1 focus:ring-primary-dim placeholder:text-outline/40" 
+                    id="confirm" 
+                    placeholder="••••••••" 
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
               
               <div className="pt-4 flex flex-col space-y-4">
-                <button className="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg rounded-md hover:shadow-[0_0_20px_rgba(143,245,255,0.3)] transition-all duration-300 active:scale-[0.98]">
-                  Register Account
+                <button 
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg rounded-md hover:shadow-[0_0_20px_rgba(143,245,255,0.3)] transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+                >
+                  {loading ? 'Creating Registry...' : 'Register Account'}
                 </button>
                 <p className="text-center text-sm text-on-surface-variant">
                   By registering, you agree to our <a className="text-primary hover:underline" href="#">Terms of Service</a> and <a className="text-primary hover:underline" href="#">Privacy Protocol</a>.

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabase';
 
 // Grid Background CSS helper or other styles
 const styles = `
@@ -13,270 +14,11 @@ const styles = `
   }
 `;
 
-const INITIAL_LANDS = [
-  // Page 1
-  {
-    id: 'LV-48201',
-    name: 'Neon Zenith Heights',
-    price: 2.5,
-    usdPrice: 5840.00,
-    owner: '0x4a...3e92',
-    fullOwner: '0x4a8b753c90e290f11db89000a12e3e92',
-    area: 4200,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
-    verified: true,
-    region: 'Heights',
-    coordinates: '42.3601° N, 71.0589° W',
-    page: 1
-  },
-  {
-    id: 'LV-91223',
-    name: 'Obsidian Rift Valley',
-    price: 4.8,
-    usdPrice: 11210.00,
-    owner: '0x9b...1f12',
-    fullOwner: '0x9b5d21fe829aa1828cb0f124b89e1f12',
-    area: 8500,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeau8hkXkDNK6Nr_BaFj2SyJ330UjDaguDZzZI4EDVxsB-2t2iQWd9U6eeuDzTUnlzLdu6BISKgVoxLEFA_IvMyqsaR5x0nxhjeINeQPMetg8IskIDpUDFfUYCBLGSzRb7WhidQ9xep2byXLLzvh_NFv-JaVlCixFaGJLDsbHeYuY-eFV0Cqn1Vg8YZWCHF6rJb_X9CoOOdpH3t2LWkG3QHgidwPUxD74hGtmPbOm0lSzRrXvO1xwkDjpWBE9g6ZeycQbozg9P9P8x',
-    verified: true,
-    region: 'Valley',
-    coordinates: '34.0522° N, 118.2437° W',
-    page: 1
-  },
-  {
-    id: 'LV-12005',
-    name: 'Ethereal Plain III',
-    price: 1.2,
-    usdPrice: 2800.00,
-    owner: '0xcc...aa88',
-    fullOwner: '0xecca88bf99ee32ab12f6cd99aa888c3a',
-    area: 2100,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmRKc4pCgz7fZznE2gFWXS-usBIQe6SISRZ-q_1d0AlNO3BqHdM-Ek7mgF9a6Lnrgsjuq9fg8802UHAXmZ6HtB_lTxxklafsv1NNEM_az2r3ysTHByqXXjhckZ4odMhx5f_82Z5FnFPDpqTlBEdHUlhlp97hfB7yu5vP2O7fAUmCgwvxivvBAS_eFY7rTNc6ERW-mNB7POHuZ321nTClhqDAqFtRGqtGsDWcPGugjI7sCYpw7LB8pyxnD4bPW2m-RlaeACXDfsB82f',
-    verified: true,
-    region: 'Plain',
-    coordinates: '51.5074° N, 0.1278° W',
-    page: 1
-  },
-  {
-    id: 'LV-66710',
-    name: 'Prism Coast District',
-    price: 6.4,
-    usdPrice: 14950.00,
-    owner: '0xfe...0031',
-    fullOwner: '0xfe0031cb67aa229ef5e003120199aa12',
-    area: 12000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHzAkNxPPcKNNMuaEyROjKLqWjPzsVaVFAi60oe6YgOLdExaku-jDlM1tVHlcNzLK6A7-IuAbM-6VeMuhpqOGOBCphPxiK8AEq-lJ_SJdnqA2iIjTAYIidIQDjVymwqvz9CnW-3gv9qF_BDI5K0bvCwAzawntJggewdAebLiTtrGQdHT869EM1qE1FRzuh77dbaCCAf86vxnZTAH-1H9xkmQ9Ei8IvCrqg_o3ckbdnYw74ONrlgSe4q4atSpbnwCpXfg_5wPqE6QkV',
-    verified: true,
-    region: 'Coast',
-    coordinates: '48.8566° N, 2.3522° E',
-    page: 1
-  },
-  {
-    id: 'LV-33044',
-    name: 'Cyan Silence Core',
-    price: 3.2,
-    usdPrice: 7480.00,
-    owner: '0x21...bbcc',
-    fullOwner: '0x21bbcc8d2345ef01bbcc99eeffaaccb2',
-    area: 5600,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV0f9wP-mhetL0XIljeDJLkZtDOQjp4nMUrK98hydadxYfExv4y7g9UYIJsTBRTCHCpQhPxfBAyBAYTOagsZeRAqXhhNIIaSu0TY6O0K8ALuEtO9lae90U-9w00PP31Ud0yC7e6J3Xhhj0rcuF6OFlNzlthveJ91MO-tq9AEjz0dbXE7xyNkY-FQhFPR94ps-XUFVr9L_7D9owgF7vGKqrPBYGDQ8A9uCpM1ELwUBXh_vm7MNwc4Zfuho4Zp76GSd5E_21JJhql5yK',
-    verified: true,
-    region: 'Core',
-    coordinates: '35.6762° N, 139.6503° E',
-    page: 1
-  },
-  {
-    id: 'LV-00921',
-    name: 'Data Stream Gardens',
-    price: 1.9,
-    usdPrice: 4440.00,
-    owner: '0x99...eeff',
-    fullOwner: '0x99eeffaa88dd99cc11bbaacc99eeffee',
-    area: 3300,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS1e9KqS5yTjO9eAk46VTX042jTNNLqN3Z4LSdsZElWSLbAzjzcY2l2ksl-OB9DjMqcdpZzfvfJyZr_O0wFeAtx8hbbwpmKlhLEJPWsQbzsa2MkL4ZqSlJP7pjuBrlQWc-aqDDacfR81KREHsDIizTFfMTkqMWdwMYUFq513mRqacPDlE08fx3rqi3uiPpTskpJQ2moyNb8r_VbB5fst1TB3hHtiAYHk1rUUgLiTgUB0wXuX80OdG1mAaGQQX2mP7VDE558lqy4zkd',
-    verified: true,
-    region: 'Gardens',
-    coordinates: '25.2048° N, 55.2708° E',
-    page: 1
-  },
-
-  // Page 2
-  {
-    id: 'LV-11204',
-    name: 'Nexus Helix Apex',
-    price: 5.1,
-    usdPrice: 11900.00,
-    owner: '0xbc...df01',
-    fullOwner: '0xbc01df01bbaacc1192efda0192e2df01',
-    area: 7200,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCTHk7S3F-bKLRTsMlCOiK5FUTfl8k2N26eG-MDNkrV0joDJ118dj4NHEf6fXxpKOvX70afNwVuQviouu5zdxZjOFXWQkiFu7ngIPRUkMivdlGQycPsg5CS-3gniKxDjTPFn1S51kPrMWrGIoCnaygPJZa5swDiAdvURqesOlGYrK4ISJShcgwurx1xSd0XnBT-W5YoGeDmJlr_u8wS2Xma3NODFsTUEw_mAHxUKN7CqG_5tTU1Nrly40U4FOhwPmleiscK9U2cCyut',
-    verified: true,
-    region: 'Heights',
-    coordinates: '40.7128° N, 74.0060° W',
-    page: 2
-  },
-  {
-    id: 'LV-58392',
-    name: 'Quantum Rift Ridge',
-    price: 3.7,
-    usdPrice: 8650.00,
-    owner: '0x4d...bc39',
-    fullOwner: '0x4dbc39ee82bbaacc1199eeffccaabc39',
-    area: 6100,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCbPIpKmurIl87B6L9xfw4UZa_t1qgVbg09uLe8zs5Rlp9WWUc5kFK5nA-ruQNtJHN3fKhK-QKOca6gY56wvPWwwIXJn-JxPSO9DqNgtrkjDUv4QPjx_6fgK2YsR3a3b_XSVqfmfnhLDVpj5gHZ7nMdqJrVz_2ZjhXmlJ3Yi_UkKd6_exPaeSFGybCYeu2voJ_EkuPtGeqL14FAoYXEJwRzhKlnzNEMngA0j3DQ93jDaKT7YzD5kM-8gt53biGaeXv4QrYKZi0xfh1a',
-    verified: true,
-    region: 'Valley',
-    coordinates: '37.7749° N, 122.4194° W',
-    page: 2
-  },
-  {
-    id: 'LV-88201',
-    name: 'Chrome Dunes IV',
-    price: 0.9,
-    usdPrice: 2100.00,
-    owner: '0x3a...e4d2',
-    fullOwner: '0x3ae4d2aa99eeffcca123ffaa99eedd32',
-    area: 1800,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmRKc4pCgz7fZznE2gFWXS-usBIQe6SISRZ-q_1d0AlNO3BqHdM-Ek7mgF9a6Lnrgsjuq9fg8802UHAXmZ6HtB_lTxxklafsv1NNEM_az2r3ysTHByqXXjhckZ4odMhx5f_82Z5FnFPDpqTlBEdHUlhlp97hfB7yu5vP2O7fAUmCgwvxivvBAS_eFY7rTNc6ERW-mNB7POHuZ321nTClhqDAqFtRGqtGsDWcPGugjI7sCYpw7LB8pyxnD4bPW2m-RlaeACXDfsB82f',
-    verified: false,
-    region: 'Plain',
-    coordinates: '22.3193° N, 114.1694° E',
-    page: 2
-  },
-  {
-    id: 'LV-24901',
-    name: 'Vapor Horizon Shores',
-    price: 8.2,
-    usdPrice: 19150.00,
-    owner: '0x8b...3219',
-    fullOwner: '0x8b321900eeddbbaaccff1122aacc3219',
-    area: 15000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
-    verified: true,
-    region: 'Coast',
-    coordinates: '-33.8688° S, 151.2093° E',
-    page: 2
-  },
-  {
-    id: 'LV-44910',
-    name: 'Solar Grid Node',
-    price: 2.8,
-    usdPrice: 6540.00,
-    owner: '0xab...f201',
-    fullOwner: '0xabf201c0eeddbbaaccff88880011f201',
-    area: 4900,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV0f9wP-mhetL0XIljeDJLkZtDOQjp4nMUrK98hydadxYfExv4y7g9UYIJsTBRTCHCpQhPxfBAyBAYTOagsZeRAqXhhNIIaSu0TY6O0K8ALuEtO9lae90U-9w00PP31Ud0yC7e6J3Xhhj0rcuF6OFlNzlthveJ91MO-tq9AEjz0dbXE7xyNkY-FQhFPR94ps-XUFVr9L_7D9owgF7vGKqrPBYGDQ8A9uCpM1ELwUBXh_vm7MNwc4Zfuho4Zp76GSd5E_21JJhql5yK',
-    verified: true,
-    region: 'Core',
-    coordinates: '1.3521° N, 103.8198° E',
-    page: 2
-  },
-  {
-    id: 'LV-09231',
-    name: 'Flowing Code Atrium',
-    price: 4.1,
-    usdPrice: 9590.00,
-    owner: '0x71...5591',
-    fullOwner: '0x71559102dd99cc11bbaacc99eeffee88',
-    area: 6800,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS1e9KqS5yTjO9eAk46VTX042jTNNLqN3Z4LSdsZElWSLbAzjzcY2l2ksl-OB9DjMqcdpZzfvfJyZr_O0wFeAtx8hbbwpmKlhLEJPWsQbzsa2MkL4ZqSlJP7pjuBrlQWc-aqDDacfR81KREHsDIizTFfMTkqMWdwMYUFq513mRqacPDlE08fx3rqi3uiPpTskpJQ2moyNb8r_VbB5fst1TB3hHtiAYHk1rUUgLiTgUB0wXuX80OdG1mAaGQQX2mP7VDE558lqy4zkd',
-    verified: true,
-    region: 'Gardens',
-    coordinates: '-23.5505° S, -46.6333° W',
-    page: 2
-  },
-
-  // Page 3
-  {
-    id: 'LV-28491',
-    name: 'Glitch Valley Citadel',
-    price: 9.5,
-    usdPrice: 22180.00,
-    owner: '0xcd...88bb',
-    fullOwner: '0xcd88bbaa99ee32aacc118822ffccaabb',
-    area: 18000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHzAkNxPPcKNNMuaEyROjKLqWjPzsVaVFAi60oe6YgOLdExaku-jDlM1tVHlcNzLK6A7-IuAbM-6VeMuhpqOGOBCphPxiK8AEq-lJ_SJdnqA2iIjTAYIidIQDjVymwqvz9CnW-3gv9qF_BDI5K0bvCwAzawntJggewdAebLiTtrGQdHT869EM1qE1FRzuh77dbaCCAf86vxnZTAH-1H9xkmQ9Ei8IvCrqg_o3ckbdnYw74ONrlgSe4q4atSpbnwCpXfg_5wPqE6QkV',
-    verified: true,
-    region: 'Valley',
-    coordinates: '55.7558° N, 37.6173° E',
-    page: 3
-  },
-  {
-    id: 'LV-77391',
-    name: 'Synthetica Coast Bay',
-    price: 1.8,
-    usdPrice: 4200.00,
-    owner: '0x0f...dd32',
-    fullOwner: '0x0fdd32aa88dd99cc11bbaacc99eeffee',
-    area: 3100,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeau8hkXkDNK6Nr_BaFj2SyJ330UjDaguDZzZI4EDVxsB-2t2iQWd9U6eeuDzTUnlzLdu6BISKgVoxLEFA_IvMyqsaR5x0nxhjeINeQPMetg8IskIDpUDFfUYCBLGSzRb7WhidQ9xep2byXLLzvh_NFv-JaVlCixFaGJLDsbHeYuY-eFV0Cqn1Vg8YZWCHF6rJb_X9CoOOdpH3t2LWkG3QHgidwPUxD74hGtmPbOm0lSzRrXvO1xwkDjpWBE9g6ZeycQbozg9P9P8x',
-    verified: true,
-    region: 'Coast',
-    coordinates: '39.9042° N, 116.4074° E',
-    page: 3
-  },
-  {
-    id: 'LV-51029',
-    name: 'Monochrome Plain II',
-    price: 0.7,
-    usdPrice: 1630.00,
-    owner: '0x55...39f1',
-    fullOwner: '0x5539f112eeddccaacc8899aacc99ffaa',
-    area: 1400,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmRKc4pCgz7fZznE2gFWXS-usBIQe6SISRZ-q_1d0AlNO3BqHdM-Ek7mgF9a6Lnrgsjuq9fg8802UHAXmZ6HtB_lTxxklafsv1NNEM_az2r3ysTHByqXXjhckZ4odMhx5f_82Z5FnFPDpqTlBEdHUlhlp97hfB7yu5vP2O7fAUmCgwvxivvBAS_eFY7rTNc6ERW-mNB7POHuZ321nTClhqDAqFtRGqtGsDWcPGugjI7sCYpw7LB8pyxnD4bPW2m-RlaeACXDfsB82f',
-    verified: false,
-    region: 'Plain',
-    coordinates: '19.4326° N, -99.1332° W',
-    page: 3
-  },
-  {
-    id: 'LV-00492',
-    name: 'Echo Silence Spire',
-    price: 3.0,
-    usdPrice: 7000.00,
-    owner: '0xfa...a212',
-    fullOwner: '0xfaa212ddaa8822abccdd99aaffeedd22',
-    area: 5200,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV0f9wP-mhetL0XIljeDJLkZtDOQjp4nMUrK98hydadxYfExv4y7g9UYIJsTBRTCHCpQhPxfBAyBAYTOagsZeRAqXhhNIIaSu0TY6O0K8ALuEtO9lae90U-9w00PP31Ud0yC7e6J3Xhhj0rcuF6OFlNzlthveJ91MO-tq9AEjz0dbXE7xyNkY-FQhFPR94ps-XUFVr9L_7D9owgF7vGKqrPBYGDQ8A9uCpM1ELwUBXh_vm7MNwc4Zfuho4Zp76GSd5E_21JJhql5yK',
-    verified: true,
-    region: 'Core',
-    coordinates: '30.0444° N, 31.2357° E',
-    page: 3
-  },
-  {
-    id: 'LV-30048',
-    name: 'Grid Stream Gardens V',
-    price: 2.2,
-    usdPrice: 5140.00,
-    owner: '0x00...eedd',
-    fullOwner: '0x00eeddffbbaacc44eeffeebbaacc4412',
-    area: 3800,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS1e9KqS5yTjO9eAk46VTX042jTNNLqN3Z4LSdsZElWSLbAzjzcY2l2ksl-OB9DjMqcdpZzfvfJyZr_O0wFeAtx8hbbwpmKlhLEJPWsQbzsa2MkL4ZqSlJP7pjuBrlQWc-aqDDacfR81KREHsDIizTFfMTkqMWdwMYUFq513mRqacPDlE08fx3rqi3uiPpTskpJQ2moyNb8r_VbB5fst1TB3hHtiAYHk1rUUgLiTgUB0wXuX80OdG1mAaGQQX2mP7VDE558lqy4zkd',
-    verified: true,
-    region: 'Gardens',
-    coordinates: '55.6761° N, 12.5683° E',
-    page: 3
-  },
-  {
-    id: 'LV-90412',
-    name: 'Nebula Zenith Heights',
-    price: 7.0,
-    usdPrice: 16350.00,
-    owner: '0x4a...3e92',
-    fullOwner: '0x4a8b753c90e290f11db89000a12e3e92',
-    area: 11000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
-    verified: true,
-    region: 'Heights',
-    coordinates: '-26.2041° S, 28.0473° E',
-    page: 3
-  }
-];
-
 const MarketPage = () => {
   const navigate = useNavigate();
   // --- STATE ---
-  const [lands, setLands] = useState(INITIAL_LANDS);
+  const [lands, setLands] = useState([]);
+  const [, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -299,6 +41,62 @@ const MarketPage = () => {
   const [walletBalance, setWalletBalance] = useState(2.45);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
+  // Fetch lands from database
+  useEffect(() => {
+    async function fetchMarketplaceLands() {
+      try {
+        setLoading(true);
+        // Query approved properties
+        const { data: properties, error: propError } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'approved');
+
+        if (propError) throw propError;
+
+        // Query active listings to match prices if available
+        const { data: listings } = await supabase
+          .from('marketplace_listings')
+          .select('*')
+          .eq('status', 'active');
+
+        const priceMap = {};
+        if (listings) {
+          listings.forEach(l => {
+            priceMap[l.property_id] = l;
+          });
+        }
+
+        const formattedLands = properties.map(item => {
+          const listing = priceMap[item.id];
+          return {
+            id: item.property_code || `LV-${item.id.slice(0, 5).toUpperCase()}`,
+            dbId: item.id,
+            name: item.name,
+            price: listing ? parseFloat(listing.price_eth) : (parseFloat(item.token_id || 1) * 0.1 || 1.5),
+            usdPrice: listing ? parseFloat(listing.price_usd) : (parseFloat(item.area || 1000) * 1.5),
+            owner: item.owner_id ? `0x${item.owner_id.slice(0, 4)}...${item.owner_id.slice(-4)}` : '0x00...0000',
+            fullOwner: item.owner_id || '',
+            area: parseFloat(item.area) || 3000,
+            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
+            verified: item.status === 'approved',
+            region: item.physical_address ? item.physical_address.split(',')[0].trim() : 'Neo-Sector',
+            coordinates: `${item.latitude || '0.0000'}° N, ${item.longitude || '0.0000'}° W`,
+            description: item.description,
+            page: 1
+          };
+        });
+
+        setLands(formattedLands);
+      } catch (err) {
+        console.error('Error fetching marketplace lands:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchMarketplaceLands();
+  }, []);
+
   // Modals State
   const [activeDetailLand, setActiveDetailLand] = useState(null);
   const [activeCheckoutLand, setActiveCheckoutLand] = useState(null);
@@ -310,7 +108,6 @@ const MarketPage = () => {
   const [toasts, setToasts] = useState([]);
 
   // --- REFS & SCROLL PARALLAX ---
-  const headerRef = useRef(null);
   const filterBarRef = useRef(null);
 
   useEffect(() => {

@@ -1,8 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+const FileUploadSlot = ({ id, label, sublabel, file, onFileChange }) => (
+  <div
+    className={`group relative rounded-md border-2 border-dashed transition-all p-8 flex flex-col items-center justify-center text-center cursor-pointer min-h-[220px]
+      ${file
+        ? 'border-primary/60 bg-primary/5'
+        : 'border-outline-variant/30 hover:border-primary/50 bg-surface-container-lowest'
+      }`}
+  >
+    <input
+      id={id}
+      type="file"
+      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+      onChange={e => onFileChange(e.target.files[0] || null)}
+    />
+    {file ? (
+      <>
+        <span className="material-symbols-outlined text-4xl text-primary mb-4">check_circle</span>
+        <span className="text-sm font-medium text-primary break-all px-2">{file.name}</span>
+        <span className="text-xs text-on-surface-variant mt-1">Click to replace</span>
+      </>
+    ) : (
+      <>
+        <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 group-hover:text-primary transition-colors">
+          add_photo_alternate
+        </span>
+        <span className="text-sm font-medium text-on-surface">{label}</span>
+        <span className="text-xs text-on-surface-variant mt-1">{sublabel}</span>
+      </>
+    )}
+  </div>
+);
 
 const KYCVerificationPage = () => {
-  const navigate = useNavigate();
   const [idFrontFile, setIdFrontFile] = useState(null);
   const [idBackFile, setIdBackFile] = useState(null);
   const [addressFile, setAddressFile] = useState(null);
@@ -66,37 +97,7 @@ const KYCVerificationPage = () => {
     }, 2200);
   };
 
-  const FileUploadSlot = ({ id, label, sublabel, file, onFileChange }) => (
-    <div
-      className={`group relative rounded-md border-2 border-dashed transition-all p-8 flex flex-col items-center justify-center text-center cursor-pointer min-h-[220px]
-        ${file
-          ? 'border-primary/60 bg-primary/5'
-          : 'border-outline-variant/30 hover:border-primary/50 bg-surface-container-lowest'
-        }`}
-    >
-      <input
-        id={id}
-        type="file"
-        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-        onChange={e => onFileChange(e.target.files[0] || null)}
-      />
-      {file ? (
-        <>
-          <span className="material-symbols-outlined text-4xl text-primary mb-4">check_circle</span>
-          <span className="text-sm font-medium text-primary break-all px-2">{file.name}</span>
-          <span className="text-xs text-on-surface-variant mt-1">Click to replace</span>
-        </>
-      ) : (
-        <>
-          <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 group-hover:text-primary transition-colors">
-            add_photo_alternate
-          </span>
-          <span className="text-sm font-medium text-on-surface">{label}</span>
-          <span className="text-xs text-on-surface-variant mt-1">{sublabel}</span>
-        </>
-      )}
-    </div>
-  );
+
 
   return (
     <div className="bg-surface text-on-surface font-body min-h-screen custom-scrollbar selection:bg-primary/30">

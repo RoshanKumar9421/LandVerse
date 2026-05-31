@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const ConnectWalletPage = () => {
-  const navigate = useNavigate();
   const cardRef = useRef(null);
-  const [hoveredButton, setHoveredButton] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [connectedWallet, setConnectedWallet] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -86,8 +84,6 @@ const ConnectWalletPage = () => {
             {/* MetaMask */}
             <button
               onClick={() => handleWalletConnect('MetaMask')}
-              onMouseEnter={() => setHoveredButton('metamask')}
-              onMouseLeave={() => setHoveredButton(null)}
               disabled={!!connectedWallet || !!isConnecting}
               className={`group w-full flex items-center justify-between p-5 rounded-md transition-all duration-300 border active:scale-[0.98]
                 ${connectedWallet === 'MetaMask'
@@ -120,8 +116,6 @@ const ConnectWalletPage = () => {
             {/* WalletConnect */}
             <button
               onClick={() => handleWalletConnect('WalletConnect')}
-              onMouseEnter={() => setHoveredButton('walletconnect')}
-              onMouseLeave={() => setHoveredButton(null)}
               disabled={!!connectedWallet || !!isConnecting}
               className={`group w-full flex items-center justify-between p-5 rounded-md transition-all duration-300 border active:scale-[0.98]
                 ${connectedWallet === 'WalletConnect'
@@ -154,8 +148,6 @@ const ConnectWalletPage = () => {
             {/* Coinbase Wallet */}
             <button
               onClick={() => handleWalletConnect('Coinbase')}
-              onMouseEnter={() => setHoveredButton('coinbase')}
-              onMouseLeave={() => setHoveredButton(null)}
               disabled={!!connectedWallet || !!isConnecting}
               className={`group w-full flex items-center justify-between p-5 rounded-md transition-all duration-300 border active:scale-[0.98]
                 ${connectedWallet === 'Coinbase'

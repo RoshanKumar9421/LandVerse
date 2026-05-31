@@ -1,9 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const loginBtnRef = useRef(null);
+
+  // State Variables
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -31,6 +38,55 @@ const LoginPage = () => {
     const y = e.clientY - rect.top;
     loginBtnRef.current.style.setProperty('--mouse-x', `${x}px`);
     loginBtnRef.current.style.setProperty('--mouse-y', `${y}px`);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    if (!email || !password) {
+      setErrorMessage('Please provide both email and security key.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to authenticate with registry.');
+      }
+
+      const isAdmin = data.user?.role === 'admin' || data.user?.table === 'adminstartator';
+      const redirectPath = isAdmin ? '/admin' : '/dashboard';
+      const targetName = isAdmin ? 'authority panel' : 'dashboard';
+
+      setSuccessMessage(`Access granted! Redirecting to secure ${targetName}...`);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.session) {
+        localStorage.setItem('session', JSON.stringify(data.session));
+      }
+
+      setTimeout(() => {
+        navigate(redirectPath);
+      }, 1500);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,12 +138,34 @@ const LoginPage = () => {
               <p className="font-body text-on-surface-variant mt-2 text-sm">Securely access your digital land holdings and title records.</p>
             </div>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }}>
+            <form className="space-y-6" onSubmit={handleLogin}>
+              {/* Error Alert */}
+              {errorMessage && (
+                <div className="p-4 bg-error-container/30 border border-error/50 rounded-md text-xs text-error font-body">
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Success Alert */}
+              {successMessage && (
+                <div className="p-4 bg-primary-container/20 border border-primary/50 rounded-md text-xs text-primary font-body">
+                  {successMessage}
+                </div>
+              )}
+
               {/* Email/User ID Input */}
               <div className="space-y-2">
-                <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant ml-1" htmlFor="username">Email or User ID</label>
+                <label className="font-label text-[10px] tracking-widest uppercase text-on-surface-variant ml-1" htmlFor="username">Email Address</label>
                 <div className="relative group">
-                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="username" placeholder="arch@landverse.xyz" type="text"/>
+                  <input 
+                    className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" 
+                    id="username" 
+                    placeholder="arch@landverse.xyz" 
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                   <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 group-focus-within:text-primary-dim transition-colors">person</span>
                 </div>
               </div>
@@ -99,7 +177,15 @@ const LoginPage = () => {
                   <a className="text-[10px] tracking-widest uppercase text-primary hover:text-primary-dim transition-colors" href="#">Forgot?</a>
                 </div>
                 <div className="relative group">
-                  <input className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" id="password" placeholder="••••••••••••" type="password"/>
+                  <input 
+                    className="w-full bg-surface-container-lowest border-none rounded-md px-5 py-4 text-on-surface focus:ring-1 focus:ring-primary-dim transition-all duration-300 placeholder:text-outline/50" 
+                    id="password" 
+                    placeholder="••••••••••••" 
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                   <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/40 group-focus-within:text-primary-dim transition-colors">lock</span>
                 </div>
               </div>
@@ -109,9 +195,11 @@ const LoginPage = () => {
                 <button 
                   ref={loginBtnRef}
                   onMouseMove={handleBtnMouseMove}
-                  className="w-full primary-gradient text-on-primary-fixed py-5 rounded-md font-headline font-bold text-lg tracking-wide hover:shadow-[0_0_20px_rgba(143,245,255,0.4)] active:scale-[0.98] transition-all duration-300"
+                  disabled={loading}
+                  type="submit"
+                  className="w-full primary-gradient text-on-primary-fixed py-5 rounded-md font-headline font-bold text-lg tracking-wide hover:shadow-[0_0_20px_rgba(143,245,255,0.4)] active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
                 >
-                  Login to Registry
+                  {loading ? 'Decrypting Portal...' : 'Login to Registry'}
                 </button>
               </div>
             </form>
@@ -123,9 +211,16 @@ const LoginPage = () => {
                   <span>Register New Account</span>
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                 </Link>
-                <a className="font-label text-xs tracking-wider text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@landverse.com');
+                    setPassword('admin12345');
+                  }}
+                  className="font-label text-xs tracking-wider text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity text-left outline-none"
+                >
                   Admin Login
-                </a>
+                </button>
               </div>
             </div>
           </div>

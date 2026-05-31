@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import MarketPage from './pages/MarketPage';
 import NFT_miningPage from './pages/NFT_miningPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
+import AdminstatorPage from './pages/AdminstatorPage';
 
 export const routes = [
   { path: '/', element: <LandingPage /> },
@@ -20,4 +21,5 @@ export const routes = [
   { path: '/marketplace', element: <MarketPage /> },
   { path: '/mint', element: <NFT_miningPage /> },
   { path: '/property/:id', element: <PropertyDetailsPage /> },
+  { path: '/admin', element: <AdminstatorPage /> },
 ];

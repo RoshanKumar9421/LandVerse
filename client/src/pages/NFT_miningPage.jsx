@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const ESTATES = [
@@ -64,9 +64,17 @@ const NFT_miningPage = () => {
   const [mintedStates, setMintedStates] = useState({ '#8821': false, '#4409': false, '#9042': false });
   
   // Wallet State
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [walletBalance, setWalletBalance] = useState(2.45);
+  const [walletConnected, setWalletConnected] = useState(() => {
+    return JSON.parse(localStorage.getItem('user') || 'null') !== null;
+  });
+  const [walletAddress, setWalletAddress] = useState(() => {
+    const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+    return localUser?.wallet_address || '';
+  });
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+    return localUser ? 12.45 : 2.45;
+  });
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   // Minting Flow state

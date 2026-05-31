@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabase';
 
 const NAV_ITEMS = [
   { icon: 'dashboard', label: 'Dashboard', id: 'dashboard' },
@@ -37,11 +38,15 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [blockNumber] = useState('18,492,031');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Database States
+  const [profile, setProfile] = useState(null);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // tick the block number up subtly
+    // Ticker logic for blockchain blocks
     const el = document.getElementById('block-ticker');
     if (!el) return;
     let n = 18492031;
@@ -51,6 +56,67 @@ const DashboardPage = () => {
     }, 4000);
     return () => clearInterval(iv);
   }, []);
+
+  // Fetch live Supabase details
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        setLoading(true);
+        const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+        const userId = localUser?.id || '11111111-1111-1111-1111-111111111111'; // fallback to Alex Sterling
+
+        // Fetch User profile details
+        const { data: profileData, error: profileErr } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
+
+        if (profileErr) throw profileErr;
+        setProfile(profileData || {
+          id: userId,
+          full_name: localUser?.fullName || 'Alex Sterling',
+          role: localUser?.role || 'seller',
+          wallet_address: '0x82f0a1e3e920d3f2c5d144888fca02d18492031'
+        });
+
+        // Fetch user owned properties
+        const { data: propertyData, error: propertyErr } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('owner_id', userId);
+
+        if (propertyErr) throw propertyErr;
+        setProperties(propertyData || []);
+      } catch (err) {
+        console.error('Error loading dashboard profile and assets:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserData();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('session');
+    navigate('/login');
+  };
+
+  // Compute live dynamic stats
+  const totalLands = properties.length;
+  const pendingLands = properties.filter(p => p.status === 'pending').length;
+  const verifiedNFTs = properties.filter(p => p.status === 'approved').length;
+
+  // Filter properties based on search query
+  const filteredProperties = properties.filter(p => {
+    const query = searchQuery.toLowerCase();
+    return (
+      (p.name?.toLowerCase().includes(query)) ||
+      (p.property_code?.toLowerCase().includes(query)) ||
+      (p.physical_address?.toLowerCase().includes(query))
+    );
+  });
 
   return (
     <div className="bg-surface text-on-surface font-body min-h-screen selection:bg-primary/20 relative">
@@ -67,7 +133,7 @@ const DashboardPage = () => {
         {/* Brand */}
         <div className="mb-12">
           <h1 className="text-2xl font-display font-bold tracking-tighter text-primary">LandVerse</h1>
-          <p className="text-xs font-label uppercase tracking-widest text-on-surface-variant mt-1">Verified Architect</p>
+          <p className="text-xs font-label uppercase tracking-widest text-on-surface-variant mt-1">Verified Client</p>
         </div>
 
         {/* Nav Links */}
@@ -107,11 +173,15 @@ const DashboardPage = () => {
             className="w-10 h-10 rounded-full border border-primary/30 flex-shrink-0"
           />
           <div className="overflow-hidden">
-            <p className="text-sm font-bold text-on-surface truncate">Alex Sterling</p>
-            <p className="text-[10px] font-label text-on-surface-variant uppercase tracking-tighter">ID: 0x82f...a1e</p>
+            <p className="text-sm font-bold text-on-surface truncate">{profile?.full_name || 'Alex Sterling'}</p>
+            <p className="text-[10px] font-label text-on-surface-variant uppercase tracking-tighter truncate">
+              {profile?.wallet_address 
+                ? `0x${profile.wallet_address.slice(2, 6)}...${profile.wallet_address.slice(-4)}` 
+                : `ID: ${profile?.id?.slice(0, 8) || '0x82f...a1e'}`}
+            </p>
           </div>
           <button
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
             title="Logout"
             className="ml-auto text-on-surface-variant hover:text-error transition-colors"
           >
@@ -165,10 +235,14 @@ const DashboardPage = () => {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
             </button>
 
-            {/* ETH Balance */}
+            {/* Wallet Address / Simulated balance */}
             <button className="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full text-on-surface-variant hover:text-primary transition-all border border-outline-variant/10">
               <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
-              <span className="text-sm font-label font-medium tracking-tight">2.45 ETH</span>
+              <span className="text-sm font-label font-medium tracking-tight">
+                {profile?.wallet_address 
+                  ? `${profile.wallet_address.slice(0, 6)}...${profile.wallet_address.slice(-4)}` 
+                  : '2.45 ETH'}
+              </span>
             </button>
           </div>
         </header>
@@ -176,149 +250,212 @@ const DashboardPage = () => {
         {/* ─── Content Body ─── */}
         <div className="p-6 md:p-10 max-w-7xl mx-auto">
 
-          {/* ── Stats Cards ── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
-            {/* Card 1 — Total Lands */}
-            <GlassCard className="p-8 relative overflow-hidden group">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl transition-all group-hover:bg-primary/20" />
-              <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">Total Lands Registered</p>
-              <div className="flex items-end gap-3">
-                <span className="text-5xl font-display font-bold text-on-surface">12</span>
-                <span className="text-primary-dim font-label text-sm mb-2">+2 this month</span>
-              </div>
-              <div className="mt-6 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
-                <div className="h-full w-3/4 primary-gradient rounded-full" />
-              </div>
-            </GlassCard>
-
-            {/* Card 2 — NFTs Owned */}
-            <GlassCard className="p-8 relative overflow-hidden group">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-secondary/10 rounded-full blur-3xl transition-all group-hover:bg-secondary/20" />
-              <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">NFTs Owned</p>
-              <div className="flex items-end gap-3">
-                <span className="text-5xl font-display font-bold text-on-surface">08</span>
-                <span className="text-secondary font-label text-sm mb-2">Portfolio Value: 12.4 ETH</span>
-              </div>
-              <div className="mt-6 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
-                <div className="h-full w-1/2 bg-secondary rounded-full" />
-              </div>
-            </GlassCard>
-
-            {/* Card 3 — Pending Verifications */}
-            <GlassCard className="p-8 relative overflow-hidden group">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-tertiary/10 rounded-full blur-3xl transition-all group-hover:bg-tertiary/20" />
-              <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">Pending Verifications</p>
-              <div className="flex items-end gap-3">
-                <span className="text-5xl font-display font-bold text-on-surface">02</span>
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
-                  <span className="text-tertiary font-label text-sm">Syncing Ledger</span>
-                </div>
-              </div>
-              <div className="mt-6 flex gap-2">
-                <div className="h-1 flex-grow bg-tertiary rounded-full" />
-                <div className="h-1 flex-grow bg-surface-container-highest rounded-full" />
-              </div>
-            </GlassCard>
-          </div>
-
-          {/* ── Section Header ── */}
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-10">
-            <div className="space-y-1">
-              <h3 className="text-3xl font-display font-bold">Recent Land Assets</h3>
-              <p className="text-on-surface-variant font-body">Manage and monitor your decentralized real estate portfolio.</p>
+          {/* Loading Loader */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+              <p className="text-sm text-on-surface-variant font-label uppercase tracking-widest">Synchronizing ledger index...</p>
             </div>
-            <Link
-              to="/kyc"
-              className="primary-gradient text-on-primary-container px-8 py-4 rounded-md font-display font-bold flex items-center gap-3 transition-all active:scale-95 shadow-[0_10px_30px_rgba(0,238,252,0.2)] hover:shadow-[0_10px_40px_rgba(0,238,252,0.35)] whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined">add</span>
-              Upload New Land
-            </Link>
-          </div>
+          ) : (
+            <>
+              {/* ── Stats Cards ── */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
+                {/* Card 1 — Total Lands */}
+                <GlassCard className="p-8 relative overflow-hidden group">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl transition-all group-hover:bg-primary/20" />
+                  <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">Total Lands Registered</p>
+                  <div className="flex items-end gap-3">
+                    <span className="text-5xl font-display font-bold text-on-surface">
+                      {totalLands.toString().padStart(2, '0')}
+                    </span>
+                    <span className="text-primary-dim font-label text-sm mb-2">Portfolio</span>
+                  </div>
+                  <div className="mt-6 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                    <div 
+                      className="h-full primary-gradient rounded-full transition-all duration-500" 
+                      style={{ width: `${totalLands > 0 ? 100 : 0}%` }}
+                    />
+                  </div>
+                </GlassCard>
 
-          {/* ── Asymmetric Land Grid ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Card 2 — NFTs Owned */}
+                <GlassCard className="p-8 relative overflow-hidden group">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-secondary/10 rounded-full blur-3xl transition-all group-hover:bg-secondary/20" />
+                  <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">NFTs Verified</p>
+                  <div className="flex items-end gap-3">
+                    <span className="text-5xl font-display font-bold text-on-surface">
+                      {verifiedNFTs.toString().padStart(2, '0')}
+                    </span>
+                    <span className="text-secondary font-label text-sm mb-2">On Consensus Layer</span>
+                  </div>
+                  <div className="mt-6 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-secondary rounded-full transition-all duration-500" 
+                      style={{ width: `${totalLands > 0 ? (verifiedNFTs / totalLands) * 100 : 0}%` }}
+                    />
+                  </div>
+                </GlassCard>
 
-            {/* Featured Card (Large) */}
-            <div className="lg:col-span-8 group">
-              <GlassCard className="relative overflow-hidden h-[400px]">
-                <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTHk7S3F-bKLRTsMlCOiK5FUTfl8k2N26eG-MDNkrV0joDJ118dj4NHEf6fXxpKOvX70afNwVuQviouu5zdxZjOFXWQkiFu7ngIPRUkMivdlGQycPsg5CS-3gniKxDjTPFn1S51kPrMWrGIoCnaygPJZa5swDiAdvURqesOlGYrK4ISJShcgwurx1xSd0XnBT-W5YoGeDmJlr_u8wS2Xma3NODFsTUEw_mAHxUKN7CqG_5tTU1Nrly40U4FOhwPmleiscK9U2cCyut"
-                  alt="Metropolis Sector 7G"
-                  className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-8 w-full flex justify-between items-end">
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-secondary-container/80 backdrop-blur-md text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">
-                        Verified NFT
-                      </span>
-                      <span className="bg-primary/20 backdrop-blur-md text-primary px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">
-                        Sector 7G
-                      </span>
+                {/* Card 3 — Pending Verifications */}
+                <GlassCard className="p-8 relative overflow-hidden group">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-tertiary/10 rounded-full blur-3xl transition-all group-hover:bg-tertiary/20" />
+                  <p className="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mb-2">Pending Verifications</p>
+                  <div className="flex items-end gap-3">
+                    <span className="text-5xl font-display font-bold text-on-surface">
+                      {pendingLands.toString().padStart(2, '0')}
+                    </span>
+                    <div className="flex items-center gap-1 mb-2">
+                      <div className={`w-2 h-2 rounded-full bg-tertiary ${pendingLands > 0 ? 'animate-pulse' : ''}`} />
+                      <span className="text-tertiary font-label text-sm">Syncing Ledger</span>
                     </div>
-                    <h4 className="text-4xl font-display font-bold mb-2">Metropolis Sector 7G</h4>
-                    <p className="text-on-surface-variant font-body flex items-center gap-2">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      Coordinates: 42.3601° N, 71.0589° W
-                    </p>
                   </div>
-                  <div className="flex gap-4">
-                    <button className="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center backdrop-blur-md hover:bg-white/10 transition-colors">
-                      <span className="material-symbols-outlined">visibility</span>
-                    </button>
-                    <button className="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center backdrop-blur-md hover:bg-white/10 transition-colors text-primary">
-                      <span className="material-symbols-outlined">share</span>
-                    </button>
+                  <div className="mt-6 flex gap-2">
+                    <div 
+                      className="h-1 bg-tertiary rounded-full transition-all duration-500" 
+                      style={{ width: `${totalLands > 0 ? (pendingLands / totalLands) * 100 : 0}%` }}
+                    />
+                    <div className="h-1 flex-grow bg-surface-container-highest rounded-full" />
                   </div>
-                </div>
-              </GlassCard>
-            </div>
-
-            {/* Right stacked cards */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-              {/* Azure Heights Card */}
-              <GlassCard className="overflow-hidden group flex flex-col flex-1">
-                <div className="h-40 relative overflow-hidden">
-                  <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbPIpKmurIl87B6L9xfw4UZa_t1qgVbg09uLe8zs5Rlp9WWUc5kFK5nA-ruQNtJHN3fKhK-QKOca6gY56wvPWwwIXJn-JxPSO9DqNgtrkjDUv4QPjx_6fgK2YsR3a3b_XSVqfmfnhLDVpj5gHZ7nMdqJrVz_2ZjhXmlJ3Yi_UkKd6_exPaeSFGybCYeu2voJ_EkuPtGeqL14FAoYXEJwRzhKlnzNEMngA0j3DQ93jDaKT7YzD5kM-8gt53biGaeXv4QrYKZi0xfh1a"
-                    alt="Azure Heights Parcel B"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 right-4 bg-tertiary-container/90 text-on-tertiary-container px-2 py-1 rounded text-[8px] font-label font-black uppercase">
-                    Minting Now
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h5 className="text-xl font-display font-bold mb-1">Azure Heights Parcel B</h5>
-                  <p className="text-xs text-on-surface-variant mb-4 font-label tracking-tighter">HASH: 0x92f...e76c</p>
-                  <div className="flex justify-between items-center mt-auto">
-                    <span className="text-primary font-bold">4.2 ETH</span>
-                    <Link to="/payment" className="text-on-surface-variant hover:text-on-surface transition-colors font-label text-xs uppercase font-bold flex items-center gap-2">
-                      View Details
-                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                    </Link>
-                  </div>
-                </div>
-              </GlassCard>
-
-              {/* Market Insight */}
-              <div className="bg-secondary-container/10 border border-secondary/20 rounded-lg p-6 flex items-start gap-4">
-                <div className="bg-secondary/20 p-3 rounded-md flex-shrink-0">
-                  <span className="material-symbols-outlined text-secondary">trending_up</span>
-                </div>
-                <div>
-                  <p className="text-sm font-display font-bold">Market Growth Alert</p>
-                  <p className="text-xs text-on-surface-variant mt-1">
-                    Land values in Metropolis Sector 7G have increased by{' '}
-                    <span className="text-secondary font-bold">14.2%</span> in the last 24 hours.
-                  </p>
-                </div>
+                </GlassCard>
               </div>
-            </div>
-          </div>
+
+              {/* ── Section Header ── */}
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-10">
+                <div className="space-y-1">
+                  <h3 className="text-3xl font-display font-bold">Recent Land Assets</h3>
+                  <p className="text-on-surface-variant font-body">Manage and monitor your decentralized real estate portfolio.</p>
+                </div>
+                <Link
+                  to="/kyc"
+                  className="primary-gradient text-on-primary-container px-8 py-4 rounded-md font-display font-bold flex items-center gap-3 transition-all active:scale-95 shadow-[0_10px_30px_rgba(0,238,252,0.2)] hover:shadow-[0_10px_40px_rgba(0,238,252,0.35)] whitespace-nowrap"
+                >
+                  <span className="material-symbols-outlined">add</span>
+                  Upload New Land
+                </Link>
+              </div>
+
+              {/* ── Asymmetric Land Grid ── */}
+              {filteredProperties.length === 0 ? (
+                <GlassCard className="p-12 text-center border border-outline-variant/15 bg-surface-container-high/20">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <span className="material-symbols-outlined text-3xl text-primary">landscape</span>
+                  </div>
+                  <h4 className="text-2xl font-display font-bold mb-2">No Registered Lands Found</h4>
+                  <p className="text-on-surface-variant max-w-md mx-auto mb-8 font-body leading-relaxed">
+                    It looks like you do not have any property files or land registry assets synchronized to this cryptographic wallet.
+                  </p>
+                  <Link
+                    to="/kyc"
+                    className="inline-flex items-center gap-2 border border-primary/30 text-primary hover:bg-primary/5 px-6 py-3 rounded font-headline font-bold text-xs uppercase transition-all"
+                  >
+                    Register Your First Land
+                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  </Link>
+                </GlassCard>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  {/* Featured Card (Large - First Element) */}
+                  <div className="lg:col-span-8 group">
+                    <GlassCard className="relative overflow-hidden h-[400px]">
+                      <img
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTHk7S3F-bKLRTsMlCOiK5FUTfl8k2N26eG-MDNkrV0joDJ118dj4NHEf6fXxpKOvX70afNwVuQviouu5zdxZjOFXWQkiFu7ngIPRUkMivdlGQycPsg5CS-3gniKxDjTPFn1S51kPrMWrGIoCnaygPJZa5swDiAdvURqesOlGYrK4ISJShcgwurx1xSd0XnBT-W5YoGeDmJlr_u8wS2Xma3NODFsTUEw_mAHxUKN7CqG_5tTU1Nrly40U4FOhwPmleiscK9U2cCyut"
+                        alt={filteredProperties[0].name}
+                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 p-8 w-full flex justify-between items-end">
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider backdrop-blur-md
+                              ${filteredProperties[0].status === 'approved' 
+                                ? 'bg-secondary-container/80 text-on-secondary-container' 
+                                : 'bg-amber-950/80 border border-amber-500 text-amber-300'}`}
+                            >
+                              {filteredProperties[0].status === 'approved' ? 'Verified NFT' : 'Pending Verification'}
+                            </span>
+                            <span className="bg-primary/20 backdrop-blur-md text-primary px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">
+                              {filteredProperties[0].property_code || 'Sector'}
+                            </span>
+                          </div>
+                          <h4 className="text-4xl font-display font-bold mb-2">{filteredProperties[0].name}</h4>
+                          <p className="text-on-surface-variant font-body flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm">location_on</span>
+                            Coordinates: {filteredProperties[0].latitude || '0.0000'}° N, {filteredProperties[0].longitude || '0.0000'}° W
+                          </p>
+                        </div>
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => navigate(`/property/${filteredProperties[0].property_code || filteredProperties[0].id}`)}
+                            className="w-12 h-12 rounded-full border border-outline-variant/30 flex items-center justify-center backdrop-blur-md hover:bg-white/10 transition-colors"
+                          >
+                            <span className="material-symbols-outlined">visibility</span>
+                          </button>
+                        </div>
+                      </div>
+                    </GlassCard>
+                  </div>
+
+                  {/* Right stacked cards (Remaining Elements) */}
+                  <div className="lg:col-span-4 flex flex-col gap-6">
+                    {filteredProperties.slice(1, 3).map((p, i) => (
+                      <GlassCard key={p.id} className="overflow-hidden group flex flex-col flex-1">
+                        <div className="h-40 relative overflow-hidden">
+                          <img
+                            src={i === 0 
+                              ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuCbPIpKmurIl87B6L9xfw4UZa_t1qgVbg09uLe8zs5Rlp9WWUc5kFK5nA-ruQNtJHN3fKhK-QKOca6gY56wvPWwwIXJn-JxPSO9DqNgtrkjDUv4QPjx_6fgK2YsR3a3b_XSVqfmfnhLDVpj5gHZ7nMdqJrVz_2ZjhXmlJ3Yi_UkKd6_exPaeSFGybCYeu2voJ_EkuPtGeqL14FAoYXEJwRzhKlnzNEMngA0j3DQ93jDaKT7YzD5kM-8gt53biGaeXv4QrYKZi0xfh1a' 
+                              : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi'}
+                            alt={p.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className={`absolute top-4 right-4 px-2 py-1 rounded text-[8px] font-label font-black uppercase
+                            ${p.status === 'approved' 
+                              ? 'bg-secondary-container/90 text-on-secondary-container' 
+                              : 'bg-amber-950/90 border border-amber-500 text-amber-300'}`}
+                          >
+                            {p.status === 'approved' ? 'Verified' : 'Pending'}
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <h5 className="text-xl font-display font-bold mb-1 truncate">{p.name}</h5>
+                          <p className="text-xs text-on-surface-variant mb-4 font-label tracking-tighter truncate">
+                            HASH: 0x{p.id.replace(/-/g, '').slice(0, 8)}...{p.id.replace(/-/g, '').slice(-4)}
+                          </p>
+                          <div className="flex justify-between items-center mt-auto">
+                            <span className="text-primary font-bold">
+                              {(parseFloat(p.token_id || 1) * 0.1 || 1.5).toFixed(1)} ETH
+                            </span>
+                            <Link 
+                              to={`/property/${p.property_code || p.id}`} 
+                              className="text-on-surface-variant hover:text-on-surface transition-colors font-label text-xs uppercase font-bold flex items-center gap-2"
+                            >
+                              View Details
+                              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </GlassCard>
+                    ))}
+
+                    {/* Market Insight (Fallback if only 1 property exists) */}
+                    {filteredProperties.length < 3 && (
+                      <div className="bg-secondary-container/10 border border-secondary/20 rounded-lg p-6 flex items-start gap-4">
+                        <div className="bg-secondary/20 p-3 rounded-md flex-shrink-0">
+                          <span className="material-symbols-outlined text-secondary">trending_up</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-display font-bold">Market Growth Alert</p>
+                          <p className="text-xs text-on-surface-variant mt-1">
+                            Land values in Neon heights are trending up by{' '}
+                            <span className="text-secondary font-bold">14.2%</span> globally.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           {/* ── Blockchain Ticker ── */}
           <div className="mt-16 flex items-center justify-center py-10">

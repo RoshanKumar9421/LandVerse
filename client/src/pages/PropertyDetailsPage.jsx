@@ -1,121 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
-const ALL_LANDS = [
-  // Page 1
-  {
-    id: 'LV-48201',
-    name: 'Neon Zenith Heights',
-    price: 2.5,
-    usdPrice: 5840.00,
-    owner: '0x4a...3e92',
-    fullOwner: '0x4a8b753c90e290f11db89000a12e3e92',
-    area: 4200,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
-    verified: true,
-    region: 'Heights',
-    coordinates: '42.3601° N, 71.0589° W',
-    description: 'A stellar architectural zenith plot featuring futuristic high-density residential towers reflecting glowing neon-cyan hues. Zoned for premium residential expansion.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Transferred to 0x4f1...99c', date: 'February 05, 2024 • 11:10 AM', priceText: '1.2 ETH', type: 'transfer' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '2.1 ETH', type: 'purchase' }
-    ]
-  },
-  {
-    id: 'LV-91223',
-    name: 'Obsidian Rift Valley',
-    price: 4.8,
-    usdPrice: 11210.00,
-    owner: '0x9b...1f12',
-    fullOwner: '0x9b5d21fe829aa1828cb0f124b89e1f12',
-    area: 8500,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeau8hkXkDNK6Nr_BaFj2SyJ330UjDaguDZzZI4EDVxsB-2t2iQWd9U6eeuDzTUnlzLdu6BISKgVoxLEFA_IvMyqsaR5x0nxhjeINeQPMetg8IskIDpUDFfUYCBLGSzRb7WhidQ9xep2byXLLzvh_NFv-JaVlCixFaGJLDsbHeYuY-eFV0Cqn1Vg8YZWCHF6rJb_X9CoOOdpH3t2LWkG3QHgidwPUxD74hGtmPbOm0lSzRrXvO1xwkDjpWBE9g6ZeycQbozg9P9P8x',
-    verified: true,
-    region: 'Valley',
-    coordinates: '34.0522° N, 118.2437° W',
-    description: 'A high-density commercial nexus plot with direct skyway access. Zoned for Level 5 architectural complexity and immersive holographic broadcasting.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Transferred to 0x4f1...99c', date: 'February 05, 2024 • 11:10 AM', priceText: '2.4 ETH', type: 'transfer' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '4.2 ETH', type: 'purchase' }
-    ]
-  },
-  {
-    id: 'LV-12005',
-    name: 'Ethereal Plain III',
-    price: 1.2,
-    usdPrice: 2800.00,
-    owner: '0xcc...aa88',
-    fullOwner: '0xecca88bf99ee32ab12f6cd99aa888c3a',
-    area: 2100,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmRKc4pCgz7fZznE2gFWXS-usBIQe6SISRZ-q_1d0AlNO3BqHdM-Ek7mgF9a6Lnrgsjuq9fg8802UHAXmZ6HtB_lTxxklafsv1NNEM_az2r3ysTHByqXXjhckZ4odMhx5f_82Z5FnFPDpqTlBEdHUlhlp97hfB7yu5vP2O7fAUmCgwvxivvBAS_eFY7rTNc6ERW-mNB7POHuZ321nTClhqDAqFtRGqtGsDWcPGugjI7sCYpw7LB8pyxnD4bPW2m-RlaeACXDfsB82f',
-    verified: true,
-    region: 'Plain',
-    coordinates: '51.5074° N, 0.1278° W',
-    description: 'A minimalist architectural landscape featuring clean white monoliths. Perfect for serene high-end residential estates or futuristic retreats.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '0.9 ETH', type: 'purchase' }
-    ]
-  },
-  {
-    id: 'LV-66710',
-    name: 'Prism Coast District',
-    price: 6.4,
-    usdPrice: 14950.00,
-    owner: '0xfe...0031',
-    fullOwner: '0xfe0031cb67aa229ef5e003120199aa12',
-    area: 12000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHzAkNxPPcKNNMuaEyROjKLqWjPzsVaVFAi60oe6YgOLdExaku-jDlM1tVHlcNzLK6A7-IuAbM-6VeMuhpqOGOBCphPxiK8AEq-lJ_SJdnqA2iIjTAYIidIQDjVymwqvz9CnW-3gv9qF_BDI5K0bvCwAzawntJggewdAebLiTtrGQdHT869EM1qE1FRzuh77dbaCCAf86vxnZTAH-1H9xkmQ9Ei8IvCrqg_o3ckbdnYw74ONrlgSe4q4atSpbnwCpXfg_5wPqE6QkV',
-    verified: true,
-    region: 'Coast',
-    coordinates: '48.8566° N, 2.3522° E',
-    description: 'A majestic digital shoreline containing floating bridges and data-stream waves. Zoned for luxury cybernetic estates and premium network nodes.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Transferred to 0x4f1...99c', date: 'February 05, 2024 • 11:10 AM', priceText: '4.8 ETH', type: 'transfer' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '5.9 ETH', type: 'purchase' }
-    ]
-  },
-  {
-    id: 'LV-33044',
-    name: 'Cyan Silence Core',
-    price: 3.2,
-    usdPrice: 7480.00,
-    owner: '0x21...bbcc',
-    fullOwner: '0x21bbcc8d2345ef01bbcc99eeffaaccb2',
-    area: 5600,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDV0f9wP-mhetL0XIljeDJLkZtDOQjp4nMUrK98hydadxYfExv4y7g9UYIJsTBRTCHCpQhPxfBAyBAYTOagsZeRAqXhhNIIaSu0TY6O0K8ALuEtO9lae90U-9w00PP31Ud0yC7e6J3Xhhj0rcuF6OFlNzlthveJ91MO-tq9AEjz0dbXE7xyNkY-FQhFPR94ps-XUFVr9L_7D9owgF7vGKqrPBYGDQ8A9uCpM1ELwUBXh_vm7MNwc4Zfuho4Zp76GSd5E_21JJhql5yK',
-    verified: true,
-    region: 'Core',
-    coordinates: '35.6762° N, 139.6503° E',
-    description: 'An asymmetrical minimalist research core highlighting sharp white lines and bright cyan glowing bars. Validated for secure ledger computing and VR node arrays.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '2.8 ETH', type: 'purchase' }
-    ]
-  },
-  {
-    id: 'LV-00921',
-    name: 'Data Stream Gardens',
-    price: 1.9,
-    usdPrice: 4440.00,
-    owner: '0x99...eeff',
-    fullOwner: '0x99eeffaa88dd99cc11bbaacc99eeffee',
-    area: 3300,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS1e9KqS5yTjO9eAk46VTX042jTNNLqN3Z4LSdsZElWSLbAzjzcY2l2ksl-OB9DjMqcdpZzfvfJyZr_O0wFeAtx8hbbwpmKlhLEJPWsQbzsa2MkL4ZqSlJP7pjuBrlQWc-aqDDacfR81KREHsDIizTFfMTkqMWdwMYUFq513mRqacPDlE08fx3rqi3uiPpTskpJQ2moyNb8r_VbB5fst1TB3hHtiAYHk1rUUgLiTgUB0wXuX80OdG1mAaGQQX2mP7VDE558lqy4zkd',
-    verified: true,
-    region: 'Gardens',
-    coordinates: '25.2048° N, 55.2708° E',
-    description: 'A luxury grid garden featuring flowing codes and translucent panels. Zoned for low-density digital residences with high-fidelity network connectivity.',
-    history: [
-      { event: 'Minted by LandVerse Genesis', date: 'January 12, 2024 • 04:22 PM', priceText: 'Origin', type: 'mint' },
-      { event: 'Transferred to 0x4f1...99c', date: 'February 05, 2024 • 11:10 AM', priceText: '1.5 ETH', type: 'transfer' },
-      { event: 'Acquired by Current Owner', date: 'March 20, 2024 • 08:45 PM', priceText: '1.8 ETH', type: 'purchase' }
-    ]
-  }
-];
+import { supabase } from '../utils/supabase';
 
 const styles = `
   @keyframes ripple {
@@ -131,18 +16,36 @@ const styles = `
 const PropertyDetailsPage = () => {
   const { id } = useParams();
   
-  // Find properties dynamically or fallback to Obsidian Rift Valley
-  const baseLand = ALL_LANDS.find((l) => l.id === id) || ALL_LANDS[1];
-  
   // --- STATE ---
-  const [land, setLand] = useState(baseLand);
+  const [land, setLand] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [purchased, setPurchased] = useState(false);
-  const [historyList, setHistoryList] = useState(baseLand.history);
+  const [historyList, setHistoryList] = useState([]);
 
-  // Wallet
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [walletBalance, setWalletBalance] = useState(2.45);
+  // --- ACTIONS ---
+  const triggerToast = (message, type = 'success') => {
+    setToasts((prev) => {
+      const nextId = prev.length > 0 ? Math.max(...prev.map((t) => t.id)) + 1 : 1;
+      const newToast = { id: nextId, message, type };
+      setTimeout(() => {
+        setToasts((activeToasts) => activeToasts.filter((t) => t.id !== nextId));
+      }, 4000);
+      return [...prev, newToast];
+    });
+  };
+
+  // Wallet State
+  const [walletConnected, setWalletConnected] = useState(() => {
+    return JSON.parse(localStorage.getItem('user') || 'null') !== null;
+  });
+  const [walletAddress, setWalletAddress] = useState(() => {
+    const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+    return localUser?.wallet_address || '';
+  });
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+    return localUser ? 12.45 : 2.45;
+  });
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   // Modals & Overlay
@@ -160,15 +63,109 @@ const PropertyDetailsPage = () => {
   // Price card radial mouse glow
   const priceCardRef = useRef(null);
 
+  // Fetch live property detail components from Supabase
   useEffect(() => {
-    // Reset page states if the URL ID parameter changes
-    const updatedBase = ALL_LANDS.find((l) => l.id === id) || ALL_LANDS[1];
-    setLand(updatedBase);
-    setHistoryList(updatedBase.history);
-    setPurchased(false);
+    async function getDetails() {
+      try {
+        setLoading(true);
+        const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+
+        // Query properties by code or uuid
+        const { data: prop, error: propErr } = await supabase
+          .from('properties')
+          .select('*')
+          .or(`property_code.eq.${id},id.eq.${id}`)
+          .maybeSingle();
+
+        if (propErr) throw propErr;
+
+        if (!prop) {
+          setLand(null);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch owner profile
+        const { data: ownerProf } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', prop.owner_id)
+          .maybeSingle();
+
+        // Fetch active marketplace listing
+        const { data: listing } = await supabase
+          .from('marketplace_listings')
+          .select('*')
+          .eq('property_id', prop.id)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        // Fetch transaction history
+        const { data: txs } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('property_id', prop.id)
+          .order('indexed_at', { ascending: true });
+
+        const computedPrice = listing ? parseFloat(listing.price_eth) : (parseFloat(prop.token_id || 1) * 0.1 || 1.5);
+        const computedUsd = listing ? parseFloat(listing.price_usd) : (parseFloat(prop.area || 1000) * 1.5);
+
+        const mappedLand = {
+          id: prop.property_code || `LV-${prop.id.slice(0, 5).toUpperCase()}`,
+          dbId: prop.id,
+          name: prop.name,
+          price: computedPrice,
+          usdPrice: computedUsd,
+          owner: ownerProf?.wallet_address ? `0x${ownerProf.wallet_address.slice(0, 4)}...${ownerProf.wallet_address.slice(-4)}` : '0x00...0000',
+          fullOwner: ownerProf?.wallet_address || '0x0000000000000000000000000000000000000000',
+          rawOwnerId: prop.owner_id,
+          area: parseFloat(prop.area) || 3000,
+          image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzWoZ9XHdraHuKsruDVenKnSg_ljRD5f0lRNXEjjLR7tSpnuOtOOZz8F_E65O3fbgrqjyg2cvPjYN9gXKsdi2K7laBqBzOlCEStDqImeBVxad-b5FFabjx5qqbkYONfWFM_PMuVtnjc3SWF6lLp3xWtu1VR78HOwzO5khV1Llw48JiE5MQnKXYG_m7ELz_xznqQJlo_P9XgRUcI9U32w-qnGqnqg5zcBOupXp3O5Eg1nH64z4WfLmYXk9ft0Idvmz16LKO1qWFvobi',
+          verified: prop.status === 'approved',
+          region: prop.physical_address ? prop.physical_address.split(',')[0].trim() : 'Heights',
+          coordinates: `${prop.latitude || '0.0000'}° N, ${prop.longitude || '0.0000'}° W`,
+          description: prop.description,
+        };
+
+        const mappedHistory = txs && txs.length > 0 
+          ? txs.map(tx => ({
+              event: tx.event_type === 'minted' 
+                ? 'Minted by LandVerse Genesis' 
+                : tx.event_type === 'listed' 
+                  ? 'Listed on Marketplace' 
+                  : tx.event_type === 'purchased' 
+                    ? 'Acquired by New Owner' 
+                    : 'Transferred',
+              date: new Date(tx.indexed_at).toLocaleString('en-US', {
+                month: 'long',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              }),
+              priceText: tx.price_eth && parseFloat(tx.price_eth) > 0 ? `${parseFloat(tx.price_eth)} ETH` : 'Origin',
+              type: tx.event_type === 'minted' ? 'mint' : tx.event_type === 'purchased' ? 'user_buy' : 'transfer'
+            }))
+          : [
+              { event: 'Minted by LandVerse Genesis', date: new Date(prop.created_at || Date.now()).toLocaleString(), priceText: 'Origin', type: 'mint' }
+            ];
+
+        setLand(mappedLand);
+        setHistoryList(mappedHistory);
+        setPurchased(prop.owner_id === localUser?.id);
+      } catch (err) {
+        console.error('Error fetching property details:', err);
+        triggerToast('Failed to sync details from Supabase ledger', 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+    getDetails();
   }, [id]);
 
   useEffect(() => {
+    if (!land) return;
     const card = priceCardRef.current;
     if (!card) return;
 
@@ -192,13 +189,6 @@ const PropertyDetailsPage = () => {
   }, [land]);
 
   // --- ACTIONS ---
-  const triggerToast = (message, type = 'success') => {
-    const newToast = { id: Date.now(), message, type };
-    setToasts((prev) => [...prev, newToast]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== newToast.id));
-    }, 4000);
-  };
 
   const handleConnectWallet = () => {
     setIsConnectingWallet(true);
@@ -241,48 +231,110 @@ const PropertyDetailsPage = () => {
     setPurchaseProgress(0);
   };
 
-  const handleConfirmPurchase = () => {
+  const handleConfirmPurchase = async () => {
     setPurchaseStep('processing');
     setPurchaseProgress(15);
     setPurchaseStatusMsg('Requesting signature confirmation in wallet...');
 
-    setTimeout(() => {
+    try {
+      const localUser = JSON.parse(localStorage.getItem('user') || 'null');
+      const userId = localUser?.id || '22222222-2222-2222-2222-222222222222'; // fallback user
+
+      // Simulated transaction phases
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setPurchaseProgress(50);
       setPurchaseStatusMsg('Awaiting block confirmation on Ethereum Consensus layer...');
 
-      setTimeout(() => {
-        setPurchaseProgress(85);
-        setPurchaseStatusMsg('Updating LandVerse Registry ledger smart contracts...');
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      setPurchaseProgress(85);
+      setPurchaseStatusMsg('Updating LandVerse Registry ledger smart contracts...');
 
-        setTimeout(() => {
-          setPurchaseProgress(100);
-          setPurchaseStep('success');
+      // Update Database
+      // 1. Update property owner
+      const { error: propErr } = await supabase
+        .from('properties')
+        .update({ owner_id: userId })
+        .eq('id', land.dbId);
 
-          // update history chain list locally
-          const nowStr = new Date().toLocaleString('en-US', {
-            month: 'long',
-            day: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-          });
-          const newHistory = [
-            ...historyList,
-            { event: 'Purchased by You', date: `${nowStr}`, priceText: `${land.price} ETH`, type: 'user_buy' }
-          ];
-          setHistoryList(newHistory);
+      if (propErr) throw propErr;
 
-          // deduct balance
-          const totalCost = land.price + 0.0042; // gas
-          setWalletBalance((prev) => parseFloat((prev - totalCost).toFixed(4)));
-          
-          setPurchased(true);
-          triggerToast(`Purchase complete! You now own ${land.name}.`, 'success');
-        }, 1200);
-      }, 1500);
-    }, 1200);
+      // 2. Mark active listings as sold
+      await supabase
+        .from('marketplace_listings')
+        .update({ status: 'sold' })
+        .eq('property_id', land.dbId)
+        .eq('status', 'active');
+
+      // 3. Insert transaction
+      const newTxHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      await supabase
+        .from('transactions')
+        .insert([{
+          property_id: land.dbId,
+          seller_id: land.rawOwnerId || null,
+          buyer_id: userId,
+          event_type: 'purchased',
+          tx_hash: newTxHash,
+          block_number: 18492040,
+          price_eth: land.price.toString(),
+          gas_used: '85000',
+          status: 'confirmed'
+        }]);
+
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setPurchaseProgress(100);
+      setPurchaseStep('success');
+
+      // Deduct wallet balance locally
+      const totalCost = land.price + 0.0042;
+      setWalletBalance((prev) => parseFloat((prev - totalCost).toFixed(4)));
+      setPurchased(true);
+
+      // Re-fetch transactions or append locally
+      const nowStr = new Date().toLocaleString('en-US', {
+        month: 'long',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+      setHistoryList(prev => [
+        ...prev,
+        { event: 'Purchased by You', date: `${nowStr}`, priceText: `${land.price} ETH`, type: 'user_buy' }
+      ]);
+
+      triggerToast(`Purchase complete! You now own ${land.name}.`, 'success');
+    } catch (err) {
+      console.error('Purchase transaction failed:', err);
+      triggerToast('Ledger transaction signature rejected or failed.', 'error');
+      setIsPurchasing(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+        <p className="text-sm font-label uppercase tracking-widest text-on-surface-variant">Synchronizing property logs...</p>
+      </div>
+    );
+  }
+
+  if (!land) {
+    return (
+      <div className="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <span className="material-symbols-outlined text-6xl text-error mb-4">gavel</span>
+        <h2 className="text-3xl font-display font-bold mb-2">Property Not Found</h2>
+        <p className="text-on-surface-variant max-w-md mx-auto mb-8 font-body">
+          We could not resolve this specific land deed code inside the cryptographic registry index.
+        </p>
+        <Link to="/marketplace" className="primary-gradient text-on-primary px-8 py-3 rounded font-headline font-bold text-xs uppercase">
+          Return to Marketplace
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen relative overflow-x-hidden">
@@ -299,8 +351,8 @@ const PropertyDetailsPage = () => {
             <Link className="text-on-surface-variant font-medium hover:text-primary-dim transition-colors duration-300" to="/marketplace">
               Marketplace
             </Link>
-            <Link className="text-on-surface-variant font-medium hover:text-primary-dim transition-colors duration-300" to="/mint">
-              Mint NFT
+            <Link className="text-on-surface-variant font-medium hover:text-primary-dim transition-colors duration-300" to="/kyc">
+              Upload Land
             </Link>
             <Link className="text-on-surface-variant font-medium hover:text-primary-dim transition-colors duration-300" to="/dashboard">
               Portfolio
@@ -472,7 +524,7 @@ const PropertyDetailsPage = () => {
                   <p className="font-display font-bold text-on-surface">{land.id.replace('LV-', '#')}</p>
                 </div>
                 <div 
-                  onClick={() => handleCopyToClipboard(purchased ? (walletConnected ? walletAddress : '0x82f0a1e3e920d3f2c5d144888fca02d18492031') : land.fullOwner)}
+                  onClick={() => handleCopyToClipboard(land.fullOwner)}
                   className="bg-surface-container-low p-4 rounded-md col-span-2 space-y-1 group cursor-pointer hover:bg-surface-container-high transition-all border border-outline-variant/5"
                 >
                   <div className="flex justify-between items-center">
@@ -482,9 +534,7 @@ const PropertyDetailsPage = () => {
                     </span>
                   </div>
                   <p className="font-display font-bold text-on-surface text-sm truncate">
-                    {purchased 
-                      ? (walletConnected ? walletAddress : '0x82f0a1e3e920d3f2c5d144888fca02d18492031') 
-                      : land.fullOwner}
+                    {land.fullOwner}
                   </p>
                 </div>
               </div>
@@ -580,7 +630,7 @@ const PropertyDetailsPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
           <div className="bg-surface-container-high border border-outline-variant/30 rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-scaleUp">
             
-            {/* Close button (only available if success or confirm) */}
+            {/* Close button */}
             {purchaseStep !== 'processing' && (
               <button 
                 onClick={() => setIsPurchasing(false)}
@@ -695,7 +745,7 @@ const PropertyDetailsPage = () => {
                 <div className="space-y-2">
                   <h3 className="font-display text-xl font-bold text-primary">Purchase Complete!</h3>
                   <p className="text-xs text-on-surface-variant font-body px-4">
-                    The transaction was securely minded in consensus block. The digital deed now resides in your connected wallet.
+                    The transaction was securely mined in consensus block. The digital deed now resides in your connected wallet.
                   </p>
                 </div>
 
